@@ -51,7 +51,7 @@ export function SiteNav() {
   );
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50 shadow-sm">
+    <header className="fixed top-0 inset-x-0 z-50 bg-black border-b border-white/10 shadow-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
           <div className="flex items-center gap-2">
@@ -62,14 +62,14 @@ export function SiteNav() {
             />
             <div className="w-0.5 h-8 sm:h-10 bg-accent rounded-full" />
             <div className="flex flex-col items-start font-sans font-black leading-[0.85] text-[10px] sm:text-base tracking-tighter uppercase">
-              <div className="text-foreground">MY WORLD</div>
+              <div className="text-white">MY WORLD</div>
               <div className="text-accent">AFRICA</div>
             </div>
           </div>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-bold uppercase tracking-wider">
+        <nav className="hidden md:flex items-center gap-8 text-sm font-bold uppercase tracking-wider text-white">
           <NavLinks />
         </nav>
 
@@ -77,7 +77,7 @@ export function SiteNav() {
           <div className="hidden md:flex items-center gap-2">
             {user ? (
               <>
-                <div className="flex items-center gap-2 px-3 py-1 bg-muted/50 rounded-full border border-border/50">
+                <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
                   {profile?.avatar_url || profile?.profile_image_url ? (
                     <img
                       src={profile.avatar_url ?? profile.profile_image_url ?? ""}
@@ -89,9 +89,9 @@ export function SiteNav() {
                       {(profile?.username ?? user.email ?? "?").slice(0, 1).toUpperCase()}
                     </div>
                   )}
-                  <span className="text-xs font-bold">{profile?.username ?? user.email}</span>
+                  <span className="text-xs font-bold text-white/90">{profile?.username ?? user.email}</span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={handleSignOut} className="h-8 hover:text-destructive">
+                <Button variant="ghost" size="sm" onClick={handleSignOut} className="h-8 text-white/70 hover:text-destructive hover:bg-white/5">
                   <LogOut className="h-4 w-4 mr-2" />
                   <span>Sign out</span>
                 </Button>
@@ -109,7 +109,7 @@ export function SiteNav() {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden text-foreground hover:bg-accent/10"
+            className="md:hidden text-white hover:bg-white/10"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

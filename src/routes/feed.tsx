@@ -20,15 +20,28 @@ export const Route = createFileRoute("/feed")({
 
 function Feed() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
       <SiteNav />
-      <main className="mx-auto max-w-7xl px-6 pt-28 pb-16">
+
+      {/* Page Background Image */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <img
+          src="/ocean.png"
+          alt="Ocean Background"
+          className="w-full h-full object-cover"
+        />
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-background" />
+      </div>
+
+      <main className="relative z-10 mx-auto max-w-7xl px-6 pt-28 pb-16">
         <header className="mb-10 max-w-2xl">
-          <div className="text-xs uppercase tracking-[0.3em] text-primary font-semibold mb-3">
+          <div className="text-xs uppercase tracking-[0.3em] text-accent font-bold mb-3 drop-shadow-md">
             Shorts · Vlogs · Memories
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold">The Feed</h1>
-          <p className="mt-3 text-muted-foreground">
+          <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-2xl">The Feed</h1>
+          <p className="mt-3 text-white/90 font-medium drop-shadow-lg">
             The pulse of the continent — freshly uploaded moments from the road.
           </p>
         </header>
