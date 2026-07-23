@@ -1,8 +1,19 @@
-import { Link } from "@tanstack/react-router";
-import { Compass } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Compass, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 export function SiteNav() {
+  const { user, profile, signOut } = useAuth();
+  const nav = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out");
+    nav({ to: "/" });
+  };
+
   return (
     <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/70 border-b border-border/50">
       <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
@@ -24,18 +35,42 @@ export function SiteNav() {
           <Link to="/feed" className="hover:text-primary transition-colors">Feed</Link>
           <Link to="/events" className="hover:text-primary transition-colors">Events</Link>
           <Link to="/events/create" className="hover:text-primary transition-colors">Host</Link>
-          <Link to="/auth" className="hover:text-primary transition-colors">Community</Link>
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link to="/auth" className="hidden sm:inline-flex">
-            <Button variant="ghost" size="sm">Sign in</Button>
-          </Link>
-          <Link to="/auth">
-            <Button size="sm" className="bg-warm-gradient text-primary-foreground shadow-warm hover:opacity-90">
-              Join the tribe
-            </Button>
-          </Link>
+          {user ? (
+            <>
+              <div className="hidden sm:flex items-center gap-2">
+                {profile?.avatar_url || profile?.profile_image_url ? (
+                  <img
+                    src={profile.avatar_url ?? profile.profile_image_url ?? ""}
+                    alt={profile?.username ?? "You"}
+                    className="h-8 w-8 rounded-full object-cover border border-border"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-full bg-warm-gradient grid place-items-center text-primary-foreground text-xs font-bold">
+                    {(profile?.username ?? user.email ?? "?").slice(0, 1).toUpperCase()}
+                  </div>
+                )}
+                <span className="text-sm font-medium">{profile?.username ?? user.email}</span>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Sign out</span>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link to="/auth" className="hidden sm:inline-flex">
+                <Button variant="ghost" size="sm">Sign in</Button>
+              </Link>
+              <Link to="/auth">
+                <Button size="sm" className="bg-warm-gradient text-primary-foreground shadow-warm hover:opacity-90">
+                  Join the tribe
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
