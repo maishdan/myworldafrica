@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventsCreateRouteImport } from './routes/events.create'
 
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
+  '/onboarding': typeof OnboardingRoute
   '/events/create': typeof EventsCreateRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
+  '/onboarding': typeof OnboardingRoute
   '/events/create': typeof EventsCreateRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,28 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
+  '/onboarding': typeof OnboardingRoute
   '/events/create': typeof EventsCreateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/events' | '/feed' | '/events/create'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/events'
+    | '/feed'
+    | '/onboarding'
+    | '/events/create'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/events' | '/feed' | '/events/create'
-  id: '__root__' | '/' | '/auth' | '/events' | '/feed' | '/events/create'
+  to: '/' | '/auth' | '/events' | '/feed' | '/onboarding' | '/events/create'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/events'
+    | '/feed'
+    | '/onboarding'
+    | '/events/create'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,10 +98,18 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   EventsRoute: typeof EventsRouteWithChildren
   FeedRoute: typeof FeedRoute
+  OnboardingRoute: typeof OnboardingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/feed': {
       id: '/feed'
       path: '/feed'
@@ -134,6 +164,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   EventsRoute: EventsRouteWithChildren,
   FeedRoute: FeedRoute,
+  OnboardingRoute: OnboardingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

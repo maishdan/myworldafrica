@@ -35,8 +35,14 @@ function Auth() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) nav({ to: "/feed" });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("phone, username")
+        .eq("id", data.session.user.id)
+        .maybeSingle();
+      nav({ to: p?.phone && p?.username ? "/feed" : "/onboarding" });
     });
   }, [nav]);
 
@@ -49,7 +55,7 @@ function Auth() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/feed`,
+            emailRedirectTo: `${window.location.origin}/onboarding`,
             data: {
               username,
               phone,
@@ -65,7 +71,13 @@ function Auth() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back, explorer.");
-        nav({ to: "/feed" });
+        const { data: u } = await supabase.auth.getUser();
+        const { data: p } = await supabase
+          .from("profiles")
+          .select("phone, username")
+          .eq("id", u.user!.id)
+          .maybeSingle();
+        nav({ to: p?.phone && p?.username ? "/feed" : "/onboarding" });
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
@@ -78,7 +90,7 @@ function Auth() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/feed` },
+      options: { redirectTo: `${window.location.origin}/onboarding` },
     });
     if (error) {
       toast.error(error.message);
