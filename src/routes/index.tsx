@@ -18,11 +18,11 @@ export const Route = createFileRoute("/")({
         content:
           "Community for African riders, drivers and explorers. Share shorts and vlogs, host events, and get PDF tickets delivered instantly.",
       },
-      { property: "og:title", content: "MyWorldAfrica — Ride, Drive & Explore" },
+      { property: "og:title", content: "MyWorldAfrica — Ride, Drive & Explore the Continent" },
       {
         property: "og:description",
         content:
-          "Share journeys, host events, get instant PDF tickets. The heartbeat of African adventure travel.",
+          "Community for African riders, drivers and explorers. Share shorts and vlogs, host events, and get PDF tickets delivered instantly.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
