@@ -3,6 +3,11 @@ export function SiteFooter() {
     <footer className="border-t border-border/60 bg-muted/30 mt-24">
       <div className="mx-auto max-w-7xl px-6 py-12 grid gap-8 md:grid-cols-4">
         <div className="md:col-span-2">
+          <img
+            src="/africa%20logo.png"
+            alt="My World Africa"
+            className="h-12 w-12 rounded-full object-cover mb-4 animate-heartbeat hover:scale-110 transition-transform"
+          />
           <div className="font-display text-2xl font-bold">
             My World <span className="text-gradient-warm">Africa</span>
           </div>

@@ -40,6 +40,13 @@
 
   --shadow-glow: 0 20px 60px -20px oklch(0.55 0.18 40 / 0.55);
   --shadow-warm: 0 10px 40px -10px oklch(0.35 0.1 40 / 0.4);
+
+  --animate-heartbeat: heartbeat 2s ease-in-out infinite;
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
 }
 
 :root {

@@ -46,38 +46,38 @@ function Landing() {
           height={1200}
         />
         <div className="absolute inset-0 bg-hero-gradient" />
-        <div className="relative z-10 mx-auto max-w-7xl px-6 pt-40 pb-24 min-h-screen flex flex-col justify-center">
+        <div className="relative z-10 mx-auto max-w-7xl px-6 pt-32 sm:pt-40 pb-16 sm:pb-24 min-h-screen flex flex-col justify-center">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-white/90 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-3 py-1.5 sm:px-4 text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.25em] text-white/90 mb-6">
               <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
               From Cape to Cairo — 54 countries, one community
             </div>
-            <h1 className="font-display text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.95]">
+            <h1 className="font-display text-white text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1] sm:leading-[0.95]">
               Ride the road.<br />
               <span className="text-gradient-warm">Own the story.</span>
             </h1>
-            <p className="mt-6 text-lg md:text-xl text-white/85 max-w-2xl leading-relaxed">
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl text-white/85 max-w-2xl leading-relaxed">
               MyWorldAfrica is where African explorers, riders and drivers meet. Post
               shorts and vlogs from your journey, host meetups anywhere on the
               continent, and get automated PDF tickets in your inbox.
             </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <Link to="/events">
-                <Button size="lg" className="bg-warm-gradient text-primary-foreground shadow-glow hover:opacity-95 h-14 px-8 text-base">
+            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4">
+              <Link to="/events" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto bg-warm-gradient text-primary-foreground shadow-glow hover:opacity-95 h-12 sm:h-14 px-8 text-base">
                   Explore Events <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link to="/feed">
-                <Button size="lg" variant="outline" className="h-14 px-8 text-base border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur">
+              <Link to="/feed" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 sm:h-14 px-8 text-base border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur">
                   <Play className="mr-2 h-4 w-4" /> Watch the Feed
                 </Button>
               </Link>
             </div>
 
-            <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg">
+            <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8 max-w-lg">
               <Stat n="12K+" l="Explorers" />
               <Stat n="540+" l="Events hosted" />
-              <Stat n="38" l="Countries" />
+              <Stat n="38" l="Countries" className="col-span-2 sm:col-span-1" />
             </div>
           </div>
         </div>
@@ -212,11 +212,11 @@ function Landing() {
   );
 }
 
-function Stat({ n, l }: { n: string; l: string }) {
+function Stat({ n, l, className }: { n: string; l: string; className?: string }) {
   return (
-    <div>
-      <div className="font-display text-3xl md:text-4xl font-bold text-white">{n}</div>
-      <div className="text-xs uppercase tracking-widest text-white/70 mt-1">{l}</div>
+    <div className={className}>
+      <div className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white">{n}</div>
+      <div className="text-[10px] sm:text-xs uppercase tracking-widest text-white/70 mt-1">{l}</div>
     </div>
   );
 }
