@@ -3,7 +3,6 @@ import { ArrowRight, MapPin, Play, Ticket, Users, Video, Route as RouteIcon } fr
 import { Button } from "@/components/ui/button";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteFooter } from "@/components/SiteFooter";
-import heroImg from "@/assets/hero-africa.jpg";
 import ridersImg from "@/assets/riders.jpg";
 import driversImg from "@/assets/drivers.jpg";
 import explorersImg from "@/assets/explorers.jpg";
@@ -39,36 +38,40 @@ function Landing() {
       {/* HERO */}
       <section className="relative min-h-screen w-full overflow-hidden">
         <img
-          src={heroImg}
-          alt="Motorcycle rider on a red dirt road at sunset with Mount Kilimanjaro"
+          src="/back 1.png"
+          alt="African savanna with wildlife and Mount Kilimanjaro"
           className="absolute inset-0 h-full w-full object-cover"
           width={1920}
           height={1200}
         />
-        <div className="absolute inset-0 bg-hero-gradient" />
+        {/* Clean, targeted overlays for maximum visibility */}
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-background" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent hidden lg:block" />
+
         <div className="relative z-10 mx-auto max-w-7xl px-6 pt-32 sm:pt-40 pb-16 sm:pb-24 min-h-screen flex flex-col justify-center">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-3 py-1.5 sm:px-4 text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.25em] text-white/90 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.25em] text-white/90 mb-6 shadow-xl">
               <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
               From Cape to Cairo — 54 countries, one community
             </div>
-            <h1 className="font-display text-white text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1] sm:leading-[0.95]">
+            <h1 className="font-display text-white text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1] sm:leading-[0.95] drop-shadow-2xl">
               Ride the road.<br />
-              <span className="text-gradient-warm">Own the story.</span>
+              <span className="text-gradient-warm drop-shadow-sm">Own the story.</span>
             </h1>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl text-white/85 max-w-2xl leading-relaxed">
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl text-white/90 max-w-2xl leading-relaxed drop-shadow-lg font-medium">
               MyWorldAfrica is where African explorers, riders and drivers meet. Post
               shorts and vlogs from your journey, host meetups anywhere on the
               continent, and get automated PDF tickets in your inbox.
             </p>
             <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4">
               <Link to="/events" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto bg-warm-gradient text-primary-foreground shadow-glow hover:opacity-95 h-12 sm:h-14 px-8 text-base">
+                <Button size="lg" className="w-full sm:w-auto bg-warm-gradient text-primary-foreground shadow-glow hover:scale-105 transition-all duration-300 h-12 sm:h-14 px-8 text-base font-bold">
                   Explore Events <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               <Link to="/feed" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 sm:h-14 px-8 text-base border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 sm:h-14 px-8 text-base border-white/40 bg-black/20 text-white hover:bg-black/40 backdrop-blur-md transition-all duration-300">
                   <Play className="mr-2 h-4 w-4" /> Watch the Feed
                 </Button>
               </Link>
@@ -147,7 +150,7 @@ function Landing() {
             <Link
               key={e.id}
               to="/events"
-              className="group rounded-2xl overflow-hidden bg-card border border-border shadow-warm hover:shadow-glow transition-all"
+              className="group rounded-2xl overflow-hidden bg-card border border-border/60 shadow-warm hover:shadow-glow transition-all duration-300 hover:-translate-y-1"
             >
               <div className="relative aspect-[4/3] overflow-hidden">
                 <img
@@ -156,7 +159,7 @@ function Landing() {
                   loading="lazy"
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className="absolute top-3 left-3 rounded-full bg-warm-gradient px-3 py-1 text-xs font-semibold text-primary-foreground">
+                <div className="absolute top-3 left-3 rounded-full bg-warm-gradient px-3 py-1 text-[10px] font-bold text-primary-foreground shadow-lg">
                   {e.audience}
                 </div>
               </div>
@@ -179,24 +182,32 @@ function Landing() {
 
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-6 pb-24">
-        <div className="relative overflow-hidden rounded-3xl bg-warm-gradient p-10 md:p-16 text-primary-foreground">
+        <div className="relative overflow-hidden rounded-3xl p-10 md:p-16 text-primary-foreground shadow-2xl min-h-[400px] flex items-center">
+          <img
+            src="/backg2.png"
+            alt="Adventure background"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-warm-gradient/90 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+
           <div className="relative z-10 max-w-2xl">
-            <RouteIcon className="h-10 w-10 mb-4 opacity-80" />
-            <h2 className="text-4xl md:text-5xl font-bold leading-tight">
+            <RouteIcon className="h-10 w-10 mb-4 opacity-90 drop-shadow-lg" />
+            <h2 className="text-4xl md:text-5xl font-bold leading-tight drop-shadow-xl">
               Your next adventure is already on the map.
             </h2>
-            <p className="mt-4 text-lg opacity-90">
+            <p className="mt-4 text-lg opacity-95 drop-shadow-md max-w-xl font-medium">
               Join thousands of riders, drivers and explorers writing the next
               chapter of African travel. Free to join. Always.
             </p>
             <div className="mt-8 flex gap-3 flex-wrap">
               <Link to="/auth">
-                <Button size="lg" variant="secondary" className="h-13 px-8 bg-background text-foreground hover:bg-background/90">
+                <Button size="lg" variant="secondary" className="h-13 px-8 bg-background text-foreground hover:bg-background/90 shadow-xl hover:scale-105 transition-transform font-bold">
                   Create your account
                 </Button>
               </Link>
               <Link to="/events/create">
-                <Button size="lg" variant="outline" className="h-13 px-8 border-white/40 bg-white/10 text-white hover:bg-white/20">
+                <Button size="lg" variant="outline" className="h-13 px-8 border-white/40 bg-white/10 text-white hover:bg-white/20 backdrop-blur-md shadow-xl hover:scale-105 transition-transform font-bold">
                   Host an event
                 </Button>
               </Link>
@@ -223,15 +234,15 @@ function Stat({ n, l, className }: { n: string; l: string; className?: string })
 
 function Tribe({ img, tag, title, desc }: { img: string; tag: string; title: string; desc: string }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl aspect-[3/4] shadow-warm">
+    <div className="group relative overflow-hidden rounded-2xl aspect-[3/4] shadow-warm border border-white/10">
       <img src={img} alt={title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-        <div className="inline-block rounded-full bg-warm-gradient px-3 py-1 text-xs font-semibold mb-3">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-x-0 bottom-0 p-6 text-white transform transition-transform duration-500 group-hover:-translate-y-2">
+        <div className="inline-block rounded-full bg-warm-gradient px-3 py-1 text-xs font-semibold mb-3 shadow-lg">
           {tag}
         </div>
-        <h3 className="text-2xl font-bold">{title}</h3>
-        <p className="mt-2 text-sm text-white/80">{desc}</p>
+        <h3 className="text-2xl font-bold drop-shadow-md">{title}</h3>
+        <p className="mt-2 text-sm text-white/90 leading-relaxed drop-shadow-sm">{desc}</p>
       </div>
     </div>
   );
