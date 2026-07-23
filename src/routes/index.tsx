@@ -49,35 +49,62 @@ function Landing() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-background" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent hidden lg:block" />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6 pt-32 sm:pt-40 pb-16 sm:pb-24 min-h-screen flex flex-col justify-center">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.25em] text-white/90 mb-6 shadow-xl">
+        <div className="relative z-10 mx-auto max-w-7xl px-6 pt-24 pb-16 min-h-screen flex flex-col justify-center items-center">
+          {/* Floating Element at Absolute Furthest Top Right */}
+          <div className="absolute top-20 right-0 sm:right-2 md:right-4 lg:right-6 w-20 sm:w-28 md:w-36 lg:w-44 animate-float pointer-events-none z-20">
+            <div className="relative rounded-full overflow-hidden aspect-square animate-rainbow-glow border-2 border-white/20">
+              <img
+                src="/Circular.png"
+                alt="Circular Branding"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="w-full max-w-5xl flex flex-col items-center text-center">
+            {/* BRANDING LOGO BLOCK */}
+            <div className="flex items-center justify-center gap-4 sm:gap-8 mb-12 transform hover:scale-105 transition-transform duration-500">
+              <img
+                src="/a (2).png"
+                alt="My World Africa Logo"
+                className="h-28 sm:h-44 md:h-60 lg:h-72 w-auto object-contain drop-shadow-2xl"
+              />
+              <div className="w-1.5 sm:w-2 h-28 sm:h-44 md:h-60 lg:h-72 bg-accent rounded-full shadow-glow" />
+              <div className="flex flex-col items-start font-sans font-black leading-[0.85] text-4xl sm:text-6xl md:text-8xl lg:text-9xl tracking-tighter uppercase drop-shadow-2xl">
+                <div className="text-white">MY WORLD</div>
+                <div className="text-accent mt-2 sm:mt-4">AFRICA</div>
+              </div>
+            </div>
+
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.25em] text-white/90 mb-8 shadow-xl">
               <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
               From Cape to Cairo — 54 countries, one community
             </div>
-            <h1 className="font-display text-white text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1] sm:leading-[0.95] drop-shadow-2xl">
-              Ride the road.<br />
-              <span className="text-gradient-warm drop-shadow-sm">Own the story.</span>
+
+            <h1 className="font-display text-white text-3xl sm:text-5xl md:text-6xl font-bold leading-[1.1] max-w-3xl drop-shadow-2xl">
+              Ride the road. <span className="text-gradient-warm">Own the story.</span>
             </h1>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl text-white/90 max-w-2xl leading-relaxed drop-shadow-lg font-medium">
+
+            <p className="mt-6 text-base sm:text-lg md:text-xl text-white/95 max-w-2xl leading-relaxed drop-shadow-lg font-medium">
               MyWorldAfrica is where African explorers, riders and drivers meet. Post
               shorts and vlogs from your journey, host meetups anywhere on the
-              continent, and get automated PDF tickets in your inbox.
+              continent.
             </p>
-            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4">
+
+            <div className="mt-10 flex flex-col sm:flex-row gap-4 w-full justify-center px-4">
               <Link to="/events" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto bg-warm-gradient text-primary-foreground shadow-glow hover:scale-105 transition-all duration-300 h-12 sm:h-14 px-8 text-base font-bold">
-                  Explore Events <ArrowRight className="ml-2 h-4 w-4" />
+                <Button size="lg" className="w-full sm:w-auto bg-warm-gradient text-primary-foreground shadow-glow hover:scale-105 transition-all duration-300 h-14 sm:h-16 px-10 text-lg font-bold">
+                  Explore Events <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/feed" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 sm:h-14 px-8 text-base border-white/40 bg-black/20 text-white hover:bg-black/40 backdrop-blur-md transition-all duration-300">
-                  <Play className="mr-2 h-4 w-4" /> Watch the Feed
+                <Button size="lg" variant="outline" className="h-14 sm:h-16 px-10 text-lg border-white/40 bg-black/30 text-white hover:bg-black/50 backdrop-blur-md transition-all duration-300 font-bold">
+                  <Play className="mr-2 h-5 w-5" /> Watch the Feed
                 </Button>
               </Link>
             </div>
 
-            <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8 max-w-lg">
+            <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-3 gap-8 sm:gap-12 w-full max-w-2xl justify-center">
               <Stat n="12K+" l="Explorers" />
               <Stat n="540+" l="Events hosted" />
               <Stat n="38" l="Countries" className="col-span-2 sm:col-span-1" />
