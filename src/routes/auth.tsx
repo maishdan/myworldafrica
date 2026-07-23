@@ -125,10 +125,20 @@ function Auth() {
           style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url("/auth%201.png")' }}
         >
           <div className="text-center mb-6 sm:mb-8">
-            <h1 className="flex flex-col items-center leading-[0.9] font-display font-black uppercase tracking-tighter italic">
-              <span className="text-3xl sm:text-4xl md:text-5xl text-white">MY WORLD</span>
-              <span className="text-4xl sm:text-5xl md:text-6xl text-[#c15a2b]">AFRICA</span>
-            </h1>
+            {/* BRANDING LOGO BLOCK - Unified Design */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-8 transform hover:scale-105 transition-transform duration-500 w-full">
+              <img
+                src="/a (2).png"
+                alt="My World Africa Logo"
+                className="h-20 sm:h-28 w-auto object-contain drop-shadow-2xl"
+              />
+              <div className="hidden sm:block w-1 h-20 sm:h-28 bg-accent rounded-full shadow-glow" />
+              <div className="flex flex-col items-center sm:items-start font-sans font-black leading-[0.85] text-2xl sm:text-4xl tracking-tighter uppercase drop-shadow-2xl">
+                <div className="text-white">MY WORLD</div>
+                <div className="text-accent mt-1 sm:mt-2">AFRICA</div>
+              </div>
+            </div>
+
             <p className="mt-4 sm:mt-6 text-white text-xs sm:text-sm md:text-base font-normal opacity-90">
               {mode === "signin"
                 ? "Welcome Back! Login to Continue Your Adventure"

@@ -62,15 +62,15 @@ function Landing() {
           </div>
 
           <div className="w-full max-w-5xl flex flex-col items-center text-center">
-            {/* BRANDING LOGO BLOCK */}
-            <div className="flex items-center justify-center gap-4 sm:gap-8 mb-12 transform hover:scale-105 transition-transform duration-500">
+            {/* BRANDING LOGO BLOCK - Improved responsiveness */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 mb-10 sm:mb-14 transform hover:scale-105 transition-transform duration-500 w-full px-4">
               <img
                 src="/a (2).png"
                 alt="My World Africa Logo"
-                className="h-28 sm:h-44 md:h-60 lg:h-72 w-auto object-contain drop-shadow-2xl"
+                className="h-32 sm:h-44 md:h-60 lg:h-72 w-auto object-contain drop-shadow-2xl"
               />
-              <div className="w-1.5 sm:w-2 h-28 sm:h-44 md:h-60 lg:h-72 bg-accent rounded-full shadow-glow" />
-              <div className="flex flex-col items-start font-sans font-black leading-[0.85] text-4xl sm:text-6xl md:text-8xl lg:text-9xl tracking-tighter uppercase drop-shadow-2xl">
+              <div className="hidden sm:block w-1.5 sm:w-2 h-28 sm:h-44 md:h-60 lg:h-72 bg-accent rounded-full shadow-glow" />
+              <div className="flex flex-col items-center sm:items-start font-sans font-black leading-[0.85] text-4xl sm:text-6xl md:text-8xl lg:text-9xl tracking-tighter uppercase drop-shadow-2xl">
                 <div className="text-white">MY WORLD</div>
                 <div className="text-accent mt-2 sm:mt-4">AFRICA</div>
               </div>
@@ -81,11 +81,11 @@ function Landing() {
               From Cape to Cairo — 54 countries, one community
             </div>
 
-            <h1 className="font-display text-white text-3xl sm:text-5xl md:text-6xl font-bold leading-[1.1] max-w-3xl drop-shadow-2xl">
+            <h1 className="font-display text-white text-2xl sm:text-5xl md:text-6xl font-bold leading-[1.1] max-w-3xl drop-shadow-2xl px-2">
               Ride the road. <span className="text-gradient-warm">Own the story.</span>
             </h1>
 
-            <p className="mt-6 text-base sm:text-lg md:text-xl text-white/95 max-w-2xl leading-relaxed drop-shadow-lg font-medium">
+            <p className="mt-4 sm:mt-6 text-sm sm:text-lg md:text-xl text-white/95 max-w-2xl leading-relaxed drop-shadow-lg font-medium px-4">
               MyWorldAfrica is where African explorers, riders and drivers meet. Post
               shorts and vlogs from your journey, host meetups anywhere on the
               continent.
@@ -104,7 +104,7 @@ function Landing() {
               </Link>
             </div>
 
-            <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-3 gap-8 sm:gap-12 w-full max-w-2xl justify-center">
+            <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-12 w-full max-w-2xl justify-center px-4">
               <Stat n="12K+" l="Explorers" />
               <Stat n="540+" l="Events hosted" />
               <Stat n="38" l="Countries" className="col-span-2 sm:col-span-1" />
@@ -114,21 +114,32 @@ function Landing() {
       </section>
 
       {/* TRIBES */}
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="text-xs uppercase tracking-[0.3em] text-primary font-semibold mb-3">
-            Three tribes · One road
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold">Find your people</h2>
-          <p className="mt-4 text-muted-foreground">
-            Whether you burn fuel on two wheels, four wheels, or two feet — there's a
-            tribe waiting on the other side of the horizon.
-          </p>
+      <section className="relative overflow-hidden py-24">
+        {/* Subtle Background Image - Increased visibility */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <img
+            src="/all.png"
+            alt="Background"
+            className="w-full h-full object-cover"
+          />
         </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          <Tribe img={ridersImg} tag="Riders" title="Two wheels, endless dust" desc="From Honda Ace 125s to KTM Adventures — join weekend runs and cross-border rallies." />
-          <Tribe img={driversImg} tag="Drivers" title="Four wheels, open dunes" desc="4x4 convoys, offroad meets, and long-haul road trips across the continent." />
-          <Tribe img={explorersImg} tag="Explorers" title="Culture, food, stories" desc="Trekkers, foodies, photographers — the people who chase experiences." />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-6">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <div className="text-xs uppercase tracking-[0.3em] text-primary font-bold mb-3">
+              Three tribes · One road
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold">Find your people</h2>
+            <p className="mt-4 text-muted-foreground font-medium">
+              Whether you burn fuel on two wheels, four wheels, or two feet — there's a
+              tribe waiting on the other side of the horizon.
+            </p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            <Tribe img={ridersImg} tag="Riders" title="Two wheels, endless dust" desc="From Honda Ace 125s to KTM Adventures — join weekend runs and cross-border rallies." />
+            <Tribe img={driversImg} tag="Drivers" title="Four wheels, open dunes" desc="4x4 convoys, offroad meets, and long-haul road trips across the continent." />
+            <Tribe img={explorersImg} tag="Explorers" title="Culture, food, stories" desc="Trekkers, foodies, photographers — the people who chase experiences." />
+          </div>
         </div>
       </section>
 

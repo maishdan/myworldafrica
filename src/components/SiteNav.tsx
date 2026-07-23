@@ -21,28 +21,28 @@ export function SiteNav() {
     <>
       <Link
         to="/"
-        className="flex items-center gap-2 hover:text-accent transition-colors"
+        className="hover:text-accent transition-colors"
         onClick={() => setIsMenuOpen(false)}
       >
-        <Home className="h-4 w-4 md:hidden" /> Home
+        Home
       </Link>
       <Link
         to="/feed"
-        className="flex items-center gap-2 hover:text-accent transition-colors"
+        className="hover:text-accent transition-colors"
         onClick={() => setIsMenuOpen(false)}
       >
         Feed
       </Link>
       <Link
         to="/events"
-        className="flex items-center gap-2 hover:text-accent transition-colors"
+        className="hover:text-accent transition-colors"
         onClick={() => setIsMenuOpen(false)}
       >
         Events
       </Link>
       <Link
         to="/events/create"
-        className="flex items-center gap-2 hover:text-accent transition-colors"
+        className="hover:text-accent transition-colors"
         onClick={() => setIsMenuOpen(false)}
       >
         Host
@@ -117,42 +117,57 @@ export function SiteNav() {
         </div>
       </div>
 
-      {/* MOBILE MENU FLOATING TILE */}
+      {/* MOBILE MENU FLOATING TILE - Centered perfectly */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+          className="fixed inset-0 h-[100dvh] w-screen z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-300"
           onClick={() => setIsMenuOpen(false)}
         >
           <div
-            className="w-full max-w-xs bg-background border border-border shadow-2xl rounded-3xl p-8 flex flex-col items-center gap-6 animate-in zoom-in-95 duration-300"
+            className="relative w-full max-w-[320px] overflow-hidden border border-white/20 animate-rainbow-glow rounded-none p-10 flex flex-col items-center gap-8 animate-in zoom-in-95 duration-300 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center gap-3 mb-4 scale-110">
-              <img src="/a (2).png" className="h-10 w-auto" alt="Logo" />
-              <div className="w-1 h-10 bg-accent rounded-full" />
-              <div className="font-black text-left leading-none uppercase">
-                <div className="text-xs">MY WORLD</div>
-                <div className="text-sm text-accent">AFRICA</div>
+            {/* Background Image for Tile */}
+            <div className="absolute inset-0 z-0">
+              <img
+                src="/auth 1.png"
+                alt="Background"
+                className="w-full h-full object-cover opacity-30"
+              />
+              <div className="absolute inset-0 bg-black/70" />
+            </div>
+
+            {/* Logo branding - Increased visibility */}
+            <div className="relative z-10 flex items-center justify-center gap-3 transform scale-125 mb-4">
+              <img
+                src="/a (2).png"
+                alt="My World Africa Logo"
+                className="h-12 w-auto object-contain"
+              />
+              <div className="w-1 h-12 bg-accent rounded-full shadow-[0_0_15px_rgba(255,165,0,0.5)]" />
+              <div className="flex flex-col items-start font-sans font-black leading-[0.85] text-lg tracking-tighter uppercase text-white">
+                <div className="text-white">MY WORLD</div>
+                <div className="text-accent mt-0.5">AFRICA</div>
               </div>
             </div>
 
-            <nav className="flex flex-col items-center gap-6 text-lg font-black uppercase tracking-widest w-full">
+            <nav className="relative z-10 flex flex-col items-center gap-6 text-xl font-black uppercase tracking-[0.2em] w-full mt-4 text-white">
               <NavLinks />
             </nav>
 
-            <div className="w-full h-px bg-border/50 my-2" />
+            <div className="relative z-10 w-full h-px bg-white/20 mt-2" />
 
             {user ? (
               <Button
                 variant="destructive"
-                className="w-full rounded-2xl h-12 font-bold"
+                className="relative z-10 w-full rounded-none h-14 font-black tracking-widest text-xs border border-white/10"
                 onClick={handleSignOut}
               >
                 <LogOut className="h-4 w-4 mr-2" /> SIGN OUT
               </Button>
             ) : (
-              <Link to="/auth" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full bg-warm-gradient text-primary-foreground h-12 rounded-2xl font-black shadow-glow">
+              <Link to="/auth" className="relative z-10 w-full" onClick={() => setIsMenuOpen(false)}>
+                <Button className="w-full bg-warm-gradient text-primary-foreground h-14 rounded-none font-black tracking-widest text-xs shadow-glow">
                   JOIN THE TRIBE
                 </Button>
               </Link>
