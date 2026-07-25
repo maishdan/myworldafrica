@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Users, Ticket as TicketIcon, Download, ExternalLink, Calendar, MapPin, DollarSign, LayoutDashboard, Settings, Mail, Award, CheckCircle, Clock, Trash2, Route as RouteIcon, Zap, Map } from "lucide-react";
+import { Users, Ticket as TicketIcon, Download, ExternalLink, Calendar, MapPin, DollarSign, LayoutDashboard, Settings, Mail, Award, CheckCircle, Clock, Trash2, Route as RouteIcon, Zap, Map, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -22,6 +22,8 @@ function Dashboard() {
   const [myHostedEvents, setMyHostedEvents] = useState<any[]>([]);
   const [myBookedTickets, setMyBookedTickets] = useState<any[]>([]);
   const [allUsers, setAllUsers] = useState<any[]>([]); // For Admin
+  const [allEvents, setAllEvents] = useState<any[]>([]); // For Admin Global View
+  const [systemStats, setSystemStats] = useState({ totalUsers: 0, totalEvents: 0, globalRevenue: 0 });
   const [stats, setStats] = useState({ revenue: 0, points: 0, attended: 0, distance: 1240 });
 
   useEffect(() => {
@@ -71,10 +73,26 @@ function Dashboard() {
           distance: (tickets?.filter(t => t.attended).length || 0) * 450 + 120 // Simulated distance
         });
 
-        // 4. Admin Data
+        // 4. Admin Data (The General Manager View)
         if (profile?.role === "admin") {
-          const { data: users } = await supabase.from("profiles").select("*");
-          if (users) setAllUsers(users);
+          const [usersRes, eventsRes] = await Promise.all([
+            supabase.from("profiles").select("*"),
+            supabase.from("events").select("*, profiles(username)")
+          ]);
+
+          if (usersRes.data) setAllUsers(usersRes.data);
+          if (eventsRes.data) setAllEvents(eventsRes.data);
+
+          const globalRev = eventsRes.data?.reduce((acc, curr) => {
+            const count = statsData?.find(s => s.event_id === curr.id)?.taken || 0;
+            return acc + (Number(curr.price) * count);
+          }, 0) || 0;
+
+          setSystemStats({
+            totalUsers: usersRes.data?.length || 0,
+            totalEvents: eventsRes.data?.length || 0,
+            globalRevenue: globalRev
+          });
         }
       } catch (err) {
         console.error(err);
@@ -90,23 +108,29 @@ function Dashboard() {
 
   const isAdmin = profile?.role === "admin";
   const isRider = profile?.role === "rider";
+  const isDriver = profile?.role === "driver";
+  const isExplorer = profile?.role === "explorer";
 
   return (
     <div className="min-h-screen bg-black text-white">
       <SiteNav />
 
-      {/* Cinematic Background for Riders */}
-      {isRider && (
-        <div className="fixed inset-0 z-0 pointer-events-none">
-           <img src="/back 1.png" className="w-full h-full object-cover opacity-30" alt="" />
-           <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
-        </div>
-      )}
+      {/* Cinematic Backgrounds based on Role */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        {isRider && <img src="/back 1.png" className="w-full h-full object-cover opacity-30" alt="" />}
+        {isDriver && <img src="/backg2.png" className="w-full h-full object-cover opacity-30" alt="" />}
+        {isExplorer && <img src="/ocean.png" className="w-full h-full object-cover opacity-30" alt="" />}
+        {isAdmin && <img src="/all.png" className="w-full h-full object-cover opacity-20 grayscale" alt="" />}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+      </div>
 
       <main className="relative z-10 mx-auto max-w-7xl px-6 pt-28 pb-16">
         <header className="mb-12 flex flex-col md:flex-row items-center justify-between gap-8 bg-white/5 backdrop-blur-xl p-8 rounded-[3rem] border border-white/10 shadow-2xl relative overflow-hidden">
            <div className="absolute top-0 right-0 p-8 opacity-5">
-              {isRider ? <Zap className="h-48 w-48 text-accent" /> : <Award className="h-40 w-40" />}
+              {isRider ? <Zap className="h-48 w-48 text-accent" /> :
+               isDriver ? <MapIcon className="h-48 w-48 text-accent" /> :
+               isExplorer ? <Compass className="h-48 w-48 text-accent" /> :
+               <ShieldCheck className="h-48 w-48 text-accent" />}
            </div>
 
            <div className="relative z-10">
@@ -116,22 +140,26 @@ function Dashboard() {
                  </div>
                  <div>
                     <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter leading-none">
-                      {isRider ? "RIDER" : "EXPLORER"} <span className="text-accent">{profile?.username || user.email?.split("@")[0]}</span>
+                      {isRider ? "RIDER" : isDriver ? "DRIVER" : isExplorer ? "EXPLORER" : "ADMIN"} <span className="text-accent">{profile?.username || user.email?.split("@")[0]}</span>
                     </h1>
-                    <div className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40 mt-1">Verified Continental Member</div>
+                    <div className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40 mt-1">
+                      {isAdmin ? "Continental Command Authority" : "Verified Continental Member"}
+                    </div>
                  </div>
               </div>
               <div className="flex flex-wrap gap-6 text-[10px] font-black uppercase tracking-widest text-white/60">
                  <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5"><Award className="h-3 w-3 text-accent" /> {stats.points} Points</div>
-                 <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5"><CheckCircle className="h-3 w-3 text-accent" /> {stats.attended} Events Attended</div>
+                 <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5"><CheckCircle className="h-3 w-3 text-accent" /> {stats.attended} {isExplorer ? "Journeys" : "Events"}</div>
                  {isRider && <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5"><RouteIcon className="h-3 w-3 text-accent" /> {stats.distance} KM Covered</div>}
+                 {isDriver && <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5"><Map className="h-3 w-3 text-accent" /> {Math.floor(stats.distance / 1.2)} Miles</div>}
+                 {isExplorer && <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5"><Sparkles className="h-3 w-3 text-accent" /> Discovery Specialist</div>}
               </div>
            </div>
 
            <div className="relative z-10 flex gap-4">
               <Link to="/events">
                 <Button className="bg-warm-gradient h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs shadow-glow transition-transform hover:scale-105">
-                  Join a Ride
+                  {isAdmin ? "System Audit" : (isRider || isDriver ? "Join Expedition" : "Explore Africa")}
                 </Button>
               </Link>
            </div>
@@ -165,6 +193,12 @@ function Dashboard() {
                       <StatCard label="Upcoming Rides" value={myBookedTickets.filter(t => !t.attended).length} icon={Clock} color="text-blue-400" />
                       <StatCard label="Rider Status" value={stats.points > 500 ? "PRO" : "ROOKIE"} icon={Zap} color="text-yellow-400" />
                     </>
+                  ) : isDriver ? (
+                    <>
+                      <StatCard label="Expeditions" value={stats.attended} icon={MapIcon} color="text-accent" />
+                      <StatCard label="Upcoming Convoys" value={myBookedTickets.filter(t => !t.attended).length} icon={Users} color="text-blue-400" />
+                      <StatCard label="Driver Level" value={stats.points > 1000 ? "COMMANDER" : "SCOUT"} icon={ShieldCheck} color="text-green-400" />
+                    </>
                   ) : (
                     <>
                       <StatCard label="Hosted Revenue" value={`Ksh ${stats.revenue}`} icon={DollarSign} color="text-green-400" />
@@ -190,11 +224,13 @@ function Dashboard() {
                       <p className="text-white/40 text-sm font-medium leading-relaxed">
                          {isRider
                            ? "Your next mission hasn't started. Join an upcoming ride to earn points and climb the rider rankings."
+                           : isDriver
+                           ? "The convoy is waiting for its lead. Join an expedition to increase your commander rating."
                            : "Start hosting events to rally the tribe and build your community reputation."}
                       </p>
                       <Link to="/events" className="mt-8">
                          <Button className="bg-white text-black font-black uppercase tracking-widest text-[10px] rounded-xl px-8 h-12">
-                           {isRider ? "Find a Ride" : "Create Event"}
+                           {isRider ? "Find a Ride" : isDriver ? "Find Expedition" : "Create Event"}
                          </Button>
                       </Link>
                    </div>
@@ -212,7 +248,7 @@ function Dashboard() {
                      <div className="relative z-10">
                         <div className="flex justify-between items-start mb-6">
                            <div className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${ticket.attended ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-blue-500/10 text-blue-400 border-blue-500/20"}`}>
-                              {ticket.attended ? "MISSION COMPLETE" : "UPCOMING MISSION"}
+                              {ticket.attended ? (isDriver ? "EXPEDITION COMPLETE" : "MISSION COMPLETE") : (isDriver ? "UPCOMING CONVOY" : "UPCOMING MISSION")}
                            </div>
                            <img src={ticket.events?.logo_url || "/a (2).png"} className="h-8 w-auto grayscale group-hover:grayscale-0 transition-all opacity-50" alt="" />
                         </div>
@@ -271,34 +307,92 @@ function Dashboard() {
             )}
 
             {activeTab === "admin" && isAdmin && (
-              <div className="space-y-8 animate-in fade-in duration-700">
-                <h3 className="text-3xl font-black uppercase italic tracking-tighter text-accent">Continental Command</h3>
-                <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl">
-                   <table className="w-full text-left">
-                      <thead className="bg-white/5 text-[10px] uppercase font-black tracking-[0.3em] text-white/40">
-                         <tr>
-                            <th className="px-8 py-6">Operative</th>
-                            <th className="px-8 py-6">Specialization</th>
-                            <th className="px-8 py-6">Enlisted</th>
-                            <th className="px-8 py-6 text-right">Actions</th>
-                         </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/5">
-                         {allUsers.map(u => (
-                           <tr key={u.id} className="text-sm font-bold hover:bg-white/5 transition-all group">
-                              <td className="px-8 py-6">
-                                 <div className="text-white uppercase italic tracking-tighter text-lg leading-none mb-1">{u.username || "Unknown"}</div>
-                                 <div className="text-[10px] font-black uppercase text-white/30 tracking-widest">{u.email}</div>
-                              </td>
-                              <td className="px-8 py-6"><span className="text-[10px] font-black uppercase tracking-widest bg-accent/10 text-accent px-3 py-1 rounded-full border border-accent/20">{u.role}</span></td>
-                              <td className="px-8 py-6 text-white/40 text-[10px] uppercase font-black">{new Date(u.created_at).toLocaleDateString()}</td>
-                              <td className="px-8 py-6 text-right">
-                                 <Button variant="ghost" size="sm" className="text-red-500/40 hover:text-red-500 hover:bg-red-500/10 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
-                              </td>
-                           </tr>
-                         ))}
-                      </tbody>
-                   </table>
+              <div className="space-y-12 animate-in fade-in duration-700">
+                {/* Global Stats for General Manager */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  <StatCard label="Total Operatives" value={systemStats.totalUsers} icon={Users} color="text-accent" />
+                  <StatCard label="Global Missions" value={systemStats.totalEvents} icon={MapIcon} color="text-blue-400" />
+                  <StatCard label="Continental Revenue" value={`Ksh ${systemStats.globalRevenue}`} icon={DollarSign} color="text-green-400" />
+                </div>
+
+                <div className="space-y-8">
+                  <h3 className="text-3xl font-black uppercase italic tracking-tighter text-accent flex items-center gap-4">
+                    <span className="w-12 h-1 bg-accent rounded-full" /> Continental Command Authority
+                  </h3>
+
+                  {/* User Management Section */}
+                  <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl">
+                    <div className="px-8 py-6 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                      <h4 className="text-lg font-black uppercase tracking-widest">Enlisted Operatives</h4>
+                      <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">{allUsers.length} Users Active</div>
+                    </div>
+                    <table className="w-full text-left">
+                        <thead className="bg-black/20 text-[10px] uppercase font-black tracking-[0.3em] text-white/40">
+                          <tr>
+                              <th className="px-8 py-6">Operative</th>
+                              <th className="px-8 py-6">Specialization</th>
+                              <th className="px-8 py-6">Enlisted</th>
+                              <th className="px-8 py-6 text-right">Control</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {allUsers.map(u => (
+                            <tr key={u.id} className="text-sm font-bold hover:bg-white/5 transition-all group">
+                                <td className="px-8 py-6">
+                                  <div className="text-white uppercase italic tracking-tighter text-lg leading-none mb-1">{u.username || "Unknown"}</div>
+                                  <div className="text-[10px] font-black uppercase text-white/30 tracking-widest">{u.email}</div>
+                                </td>
+                                <td className="px-8 py-6">
+                                  <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${
+                                    u.role === 'admin' ? 'bg-accent/20 text-accent border-accent/40' :
+                                    u.role === 'rider' ? 'bg-blue-500/10 text-blue-400 border-blue-500/40' :
+                                    u.role === 'driver' ? 'bg-green-500/10 text-green-400 border-green-500/40' :
+                                    'bg-white/10 text-white/40 border-white/20'
+                                  }`}>
+                                    {u.role}
+                                  </span>
+                                </td>
+                                <td className="px-8 py-6 text-white/40 text-[10px] uppercase font-black">{new Date(u.created_at).toLocaleDateString()}</td>
+                                <td className="px-8 py-6 text-right">
+                                  <div className="flex justify-end gap-2">
+                                    <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-white/10"><Settings className="h-4 w-4" /></Button>
+                                    <Button variant="ghost" size="sm" className="h-10 w-10 p-0 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
+                                  </div>
+                                </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mission Oversight Section */}
+                  <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl">
+                    <div className="px-8 py-6 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                      <h4 className="text-lg font-black uppercase tracking-widest">Global Mission Oversight</h4>
+                      <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">{allEvents.length} Rallies Published</div>
+                    </div>
+                    <div className="p-8 grid gap-6">
+                      {allEvents.map(event => (
+                        <div key={event.id} className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-center gap-6 hover:border-accent/40 transition-all">
+                          <div className="flex-1">
+                            <div className="text-[10px] font-black text-accent uppercase tracking-widest mb-1">Managed Rally</div>
+                            <h5 className="text-xl font-black uppercase italic tracking-tighter leading-none mb-3">{event.title}</h5>
+                            <div className="flex flex-wrap gap-6 text-[10px] font-black uppercase tracking-widest text-white/40">
+                               <div className="flex items-center gap-2"><User className="h-3 w-3" /> Organizer: {event.profiles?.username || 'Unknown'}</div>
+                               <div className="flex items-center gap-2"><DollarSign className="h-3 w-3" /> {event.price === 0 ? "FREE" : `Ksh ${event.price}`}</div>
+                               <div className="flex items-center gap-2"><Calendar className="h-3 w-3" /> {new Date(event.date).toLocaleDateString()}</div>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Link to={`/events/${event.id}`}>
+                               <Button variant="ghost" size="sm" className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] border border-white/10">Intelligence</Button>
+                            </Link>
+                            <Button variant="ghost" size="sm" className="h-12 w-12 p-0 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 rounded-xl border border-white/10"><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
