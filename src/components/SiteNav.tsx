@@ -40,13 +40,6 @@ export function SiteNav() {
       >
         Events
       </Link>
-      <Link
-        to="/events/create"
-        className="hover:text-accent transition-colors"
-        onClick={() => setIsMenuOpen(false)}
-      >
-        Host
-      </Link>
     </>
   );
 

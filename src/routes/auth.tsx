@@ -10,6 +10,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      redirect: (search.redirect as string) || "/feed",
+    };
+  },
   head: () => ({
     meta: [
       { title: "Join the tribe · MyWorldAfrica" },
@@ -26,6 +31,7 @@ export const Route = createFileRoute("/auth")({
 const roles = ["Rider", "Driver", "Explorer"] as const;
 
 function Auth() {
+  const { redirect } = Route.useSearch();
   const nav = useNavigate();
   const [mode, setMode] = useState<"signup" | "signin">("signin");
   const [role, setRole] = useState<(typeof roles)[number]>("Rider");
@@ -39,14 +45,9 @@ function Auth() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) return;
-      const { data: p } = await supabase
-        .from("profiles")
-        .select("phone, username")
-        .eq("id", data.session.user.id)
-        .maybeSingle();
-      nav({ to: p?.phone && p?.username ? "/feed" : "/onboarding" });
+      nav({ to: redirect });
     });
-  }, [nav]);
+  }, [nav, redirect]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +58,7 @@ function Auth() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/onboarding`,
+            emailRedirectTo: `${window.location.origin}${redirect}`,
             data: {
               username,
               phone,
@@ -73,13 +74,7 @@ function Auth() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back, explorer.");
-        const { data: u } = await supabase.auth.getUser();
-        const { data: p } = await supabase
-          .from("profiles")
-          .select("phone, username")
-          .eq("id", u.user!.id)
-          .maybeSingle();
-        nav({ to: p?.phone && p?.username ? "/feed" : "/onboarding" });
+        nav({ to: redirect });
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");

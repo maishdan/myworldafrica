@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
 import { Route as EventsCreateRouteImport } from './routes/events.create'
 
 const IndexRoute = IndexRouteImport.update({
@@ -24,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRoute = EventsRouteImport.update({
@@ -41,6 +48,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsEventIdRoute = EventsEventIdRouteImport.update({
+  id: '/$eventId',
+  path: '/$eventId',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsCreateRoute = EventsCreateRouteImport.update({
   id: '/create',
   path: '/create',
@@ -50,47 +62,71 @@ const EventsCreateRoute = EventsCreateRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/onboarding': typeof OnboardingRoute
+  '/events/$eventId': typeof EventsEventIdRoute
   '/events/create': typeof EventsCreateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/onboarding': typeof OnboardingRoute
+  '/events/$eventId': typeof EventsEventIdRoute
   '/events/create': typeof EventsCreateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/onboarding': typeof OnboardingRoute
+  '/events/$eventId': typeof EventsEventIdRoute
   '/events/create': typeof EventsCreateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/events' | '/feed' | '/onboarding' | '/events/create'
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/events'
+    | '/feed'
+    | '/onboarding'
+    | '/events/$eventId'
+    | '/events/create'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/events' | '/feed' | '/onboarding' | '/events/create'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/events'
+    | '/feed'
+    | '/onboarding'
+    | '/events/$eventId'
+    | '/events/create'
   id:
     | '__root__'
     | '/'
     | '/auth'
+    | '/dashboard'
     | '/events'
     | '/feed'
     | '/onboarding'
+    | '/events/$eventId'
     | '/events/create'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  DashboardRoute: typeof DashboardRoute
   EventsRoute: typeof EventsRouteWithChildren
   FeedRoute: typeof FeedRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -110,6 +146,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events': {
@@ -133,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events/$eventId': {
+      id: '/events/$eventId'
+      path: '/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof EventsEventIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/create': {
       id: '/events/create'
       path: '/create'
@@ -144,10 +194,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface EventsRouteChildren {
+  EventsEventIdRoute: typeof EventsEventIdRoute
   EventsCreateRoute: typeof EventsCreateRoute
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
+  EventsEventIdRoute: EventsEventIdRoute,
   EventsCreateRoute: EventsCreateRoute,
 }
 
@@ -157,6 +209,7 @@ const EventsRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  DashboardRoute: DashboardRoute,
   EventsRoute: EventsRouteWithChildren,
   FeedRoute: FeedRoute,
   OnboardingRoute: OnboardingRoute,
