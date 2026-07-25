@@ -45,7 +45,10 @@ function Auth() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) return;
-      nav({ to: redirect });
+
+      // If we have a session, redirect to the intended page or dashboard
+      const target = redirect === "/feed" ? "/dashboard" : redirect;
+      nav({ to: target });
     });
   }, [nav, redirect]);
 
@@ -87,7 +90,9 @@ function Auth() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/onboarding` },
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`
+      },
     });
     if (error) {
       toast.error(error.message);
