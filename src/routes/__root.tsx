@@ -121,12 +121,27 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+import { useAuth } from "@/hooks/useAuth";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { user, profile, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user && profile) {
+      const isNavigatingToOnboarding = router.state.location.pathname === "/onboarding";
+      const isNavigatingToAuth = router.state.location.pathname === "/auth";
+
+      if (!profile.onboarding_complete && !isNavigatingToOnboarding && !isNavigatingToAuth) {
+        console.log("Onboarding incomplete. Redirecting...");
+        router.navigate({ to: "/onboarding" });
+      }
+    }
+  }, [loading, user, profile, router.state.location.pathname]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster />
     </QueryClientProvider>

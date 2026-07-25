@@ -1,17 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Compass, Upload } from "lucide-react";
+import { Compass, Upload, ShieldCheck, Lock, User, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
     meta: [
-      { title: "Complete your profile · MyWorldAfrica" },
-      { name: "description", content: "Finish setting up your MyWorldAfrica profile." },
+      { title: "Setup Your Profile · MyWorldAfrica" },
+      { name: "description", content: "Complete your onboarding to join the tribe." },
     ],
   }),
   component: Onboarding,
@@ -20,167 +21,137 @@ export const Route = createFileRoute("/onboarding")({
 const roles = ["Rider", "Driver", "Explorer"] as const;
 
 function Onboarding() {
+  const { user, profile } = useAuth();
   const nav = useNavigate();
-  const [userId, setUserId] = useState<string | null>(null);
-  const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
-  const [phone, setPhone] = useState("");
-  const [role, setRole] = useState<(typeof roles)[number]>("Rider");
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<(typeof roles)[number]>("Explorer");
   const [busy, setBusy] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) {
-        nav({ to: "/auth" });
-        return;
-      }
-      setUserId(data.user.id);
-      const meta = data.user.user_metadata ?? {};
-      setFullName(meta.full_name ?? meta.name ?? "");
-      setUsername(meta.username ?? (data.user.email?.split("@")[0] ?? ""));
-      setPhone(meta.phone ?? "");
-      if (meta.role) {
-        const r = String(meta.role);
-        const match = roles.find((x) => x.toLowerCase() === r.toLowerCase());
-        if (match) setRole(match);
-      }
-      setAvatarPreview(meta.avatar_url ?? meta.picture ?? null);
-
-      const { data: existing } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", data.user.id)
-        .maybeSingle();
-      if (existing) {
-        if (existing.full_name) setFullName(existing.full_name);
-        if (existing.username) setUsername(existing.username);
-        if (existing.phone) setPhone(existing.phone);
-        if (existing.avatar_url) setAvatarPreview(existing.avatar_url);
-      }
-    })();
-  }, [nav]);
-
-  const onPickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    setAvatarFile(f);
-    setAvatarPreview(URL.createObjectURL(f));
-  };
+    if (profile?.onboarding_complete) {
+      nav({ to: "/dashboard" });
+    }
+    if (profile?.username) setUsername(profile.username);
+  }, [profile, nav]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) return;
+    if (!user) return;
+
     setBusy(true);
     try {
-      let avatarUrl: string | null = avatarPreview;
-
-      if (avatarFile) {
-        const ext = avatarFile.name.split(".").pop() || "jpg";
-        const path = `${userId}/${Date.now()}.${ext}`;
-        const { error: upErr } = await supabase.storage
-          .from("avatars")
-          .upload(path, avatarFile, { upsert: true, contentType: avatarFile.type });
-        if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
-        avatarUrl = pub.publicUrl;
+      // 1. Update Password (especially for Google users)
+      if (password) {
+        if (password !== confirmPassword) throw new Error("Passwords do not match");
+        const { error: pwdErr } = await supabase.auth.updateUser({ password });
+        if (pwdErr) throw pwdErr;
       }
 
-      const { error: pErr } = await supabase.from("profiles").upsert({
-        id: userId,
+      // 2. Update Profile & Mark Onboarding Complete
+      const { error: pErr } = await supabase.from("profiles").update({
         username,
-        full_name: fullName,
-        phone,
-        avatar_url: avatarUrl,
-        profile_image_url: avatarUrl,
+        onboarding_complete: true,
         updated_at: new Date().toISOString(),
-      });
+      }).eq("id", user.id);
       if (pErr) throw pErr;
 
-      const { error: rErr } = await supabase
-        .from("user_roles")
-        .upsert({ user_id: userId, role: role.toLowerCase() }, { onConflict: "user_id,role" });
+      // 3. Set Role
+      const { error: rErr } = await supabase.from("user_roles").upsert({
+        user_id: user.id,
+        role: role.toLowerCase()
+      });
       if (rErr) throw rErr;
 
-      toast.success("Profile saved!");
-      nav({ to: "/feed" });
+      setFinished(true);
+      toast.success("Profile setup complete!");
+      setTimeout(() => nav({ to: "/dashboard" }), 2000);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not save profile");
+      toast.error(err instanceof Error ? err.message : "Setup failed");
     } finally {
       setBusy(false);
     }
   };
 
-  return (
-    <div className="min-h-screen grid place-items-center px-6 py-12 bg-background">
-      <div className="w-full max-w-lg">
-        <div className="flex items-center gap-2 mb-8">
-          <div className="h-9 w-9 rounded-full bg-warm-gradient grid place-items-center">
-            <Compass className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <div className="font-display font-bold text-lg">My World Africa</div>
+  if (finished) {
+     return (
+        <div className="min-h-screen bg-black grid place-items-center p-6 text-center">
+           <div className="space-y-6 animate-in zoom-in duration-500">
+              <CheckCircle2 className="h-24 w-24 text-accent mx-auto" />
+              <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">Welcome to the Tribe!</h1>
+              <p className="text-white/60 font-bold uppercase tracking-widest text-xs">Taking you to your dashboard...</p>
+           </div>
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold">Complete your profile</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Add a few details so the tribe knows who's on the road.
-        </p>
+     );
+  }
 
-        <form onSubmit={submit} className="mt-8 space-y-5">
-          <div className="flex items-center gap-4">
-            <div className="h-20 w-20 rounded-full overflow-hidden bg-muted border border-border grid place-items-center">
-              {avatarPreview ? (
-                <img src={avatarPreview} alt="avatar" className="h-full w-full object-cover" />
-              ) : (
-                <Upload className="h-6 w-6 text-muted-foreground" />
-              )}
+  return (
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Background */}
+      <img src="/back 1.png" className="absolute inset-0 w-full h-full object-cover opacity-40" alt="" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+
+      <div className="relative z-10 w-full max-w-lg">
+        <div className="bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[3rem] p-8 md:p-12 shadow-2xl">
+          <header className="text-center mb-10">
+            <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-accent/20 mb-6">
+               <Compass className="h-8 w-8 text-accent animate-spin-slow" />
             </div>
-            <label className="cursor-pointer">
-              <span className="inline-flex items-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-accent">
-                Upload picture
-              </span>
-              <input type="file" accept="image/*" onChange={onPickFile} className="hidden" />
-            </label>
-          </div>
+            <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-2">Final Step</h1>
+            <p className="text-white/50 text-[10px] uppercase font-black tracking-widest leading-relaxed">
+               Set your identity and join the continental road.
+            </p>
+          </header>
 
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full name</Label>
-            <Input id="fullName" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input id="username" required value={username} onChange={(e) => setUsername(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone number</Label>
-            <Input id="phone" type="tel" required placeholder="+254 700 000 000" value={phone} onChange={(e) => setPhone(e.target.value)} />
-          </div>
-
-          <div className="space-y-2">
-            <Label>I am a...</Label>
-            <div className="grid grid-cols-3 gap-2">
-              {roles.map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => setRole(r)}
-                  className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
-                    role === r
-                      ? "bg-warm-gradient text-primary-foreground border-transparent"
-                      : "border-border hover:bg-muted"
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
+          <form onSubmit={submit} className="space-y-6">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Username</Label>
+              <div className="relative group">
+                 <Input required value={username} onChange={(e) => setUsername(e.target.value)} placeholder="AdventureName" className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-white" />
+                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20" />
+              </div>
             </div>
-          </div>
 
-          <Button type="submit" disabled={busy} className="w-full bg-warm-gradient text-primary-foreground hover:opacity-90 h-11">
-            {busy ? "Saving..." : "Save & continue"}
-          </Button>
-        </form>
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Secure Password</Label>
+              <div className="relative group">
+                 <Input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Set local password" className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-white" />
+                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20" />
+              </div>
+            </div>
+
+            <div className="relative group">
+               <Input required type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm password" className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-white" />
+               <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20" />
+            </div>
+
+            <div className="space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 block text-center">My Tribe Role</Label>
+              <div className="grid grid-cols-3 gap-3">
+                {roles.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRole(r)}
+                    className={`h-14 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${
+                      role === r
+                        ? "bg-accent border-accent text-black shadow-lg"
+                        : "bg-white/5 border-white/5 text-white/40 hover:bg-white/10"
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Button type="submit" disabled={busy} className="w-full h-16 bg-warm-gradient text-primary-foreground font-black uppercase tracking-[0.2em] rounded-2xl shadow-glow text-lg">
+              {busy ? "Securing Account..." : "Join the Road"}
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ export interface Profile {
   phone: string | null;
   email: string | null;
   role?: string | null;
+  onboarding_complete: boolean;
 }
 
 export function useAuth() {

@@ -1,28 +1,24 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { User, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { User, Lock, Eye, EyeOff, ArrowLeft, Mail, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => {
     return {
-      redirect: (search.redirect as string) || "/feed",
+      redirect: (search.redirect as string) || "/dashboard",
     };
   },
   head: () => ({
     meta: [
-      { title: "Join the tribe · MyWorldAfrica" },
-      { name: "description", content: "Sign up or sign in as a rider, driver or explorer and start sharing the African road." },
-      { property: "og:title", content: "Join the tribe · MyWorldAfrica" },
-      { property: "og:description", content: "Create your MyWorldAfrica account." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { title: "Join the Tribe · MyWorldAfrica" },
+      { name: "description", content: "Experience the ultimate African adventure." },
     ],
   }),
   component: Auth,
@@ -32,52 +28,70 @@ const roles = ["Rider", "Driver", "Explorer"] as const;
 
 function Auth() {
   const { redirect } = Route.useSearch();
+  const { profile } = useAuth();
   const nav = useNavigate();
   const [mode, setMode] = useState<"signup" | "signin">("signin");
   const [role, setRole] = useState<(typeof roles)[number]>("Rider");
   const [username, setUsername] = useState("");
+  const [emailOrUsername, setEmailOrUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) return;
-
-      // If we have a session, redirect to the intended page or dashboard
-      const target = redirect === "/feed" ? "/dashboard" : redirect;
-      nav({ to: target });
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session && profile) {
+        if (!profile.onboarding_complete) {
+          nav({ to: "/onboarding" });
+        } else {
+          // If onboarding is complete, check role and send to correct dashboard
+          nav({ to: "/dashboard" });
+        }
+      }
     });
-  }, [nav, redirect]);
+  }, [profile, nav]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
+
     try {
       if (mode === "signup") {
+        if (password !== confirmPassword) {
+          throw new Error("Passwords do not match");
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}${redirect}`,
+            emailRedirectTo: `${window.location.origin}/dashboard`,
             data: {
               username,
-              phone,
               role: role.toLowerCase(),
             },
           },
         });
         if (error) throw error;
-        toast.success(`Welcome to the ${role} tribe!`, {
-          description: "Check your email to confirm your account.",
+        toast.success("Account created!", {
+          description: "Please check your email to confirm your account and start your adventure.",
         });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        // Sign In Logic
+        let loginEmail = emailOrUsername;
+
+        // If it's not an email, assume it's a username and fetch the email
+        if (!emailOrUsername.includes("@")) {
+          const { data, error } = await supabase.rpc('get_email_from_username', { u_name: emailOrUsername });
+          if (error || !data) throw new Error("Username not found");
+          loginEmail = data;
+        }
+
+        const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
         if (error) throw error;
-        toast.success("Welcome back, explorer.");
-        nav({ to: redirect });
+        toast.success("Welcome back to the road!");
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
@@ -90,9 +104,7 @@ function Auth() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`
-      },
+      options: { redirectTo: `${window.location.origin}/onboarding` },
     });
     if (error) {
       toast.error(error.message);
@@ -101,191 +113,175 @@ function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-black flex flex-col">
       <SiteNav />
 
-      <main
-        className="relative flex-1 w-full flex items-center md:items-end justify-center bg-cover bg-center bg-no-repeat pt-24 pb-12 px-4 sm:px-6"
-        style={{ backgroundImage: 'url("/auth.png")' }}
-      >
-        <div className="absolute inset-0 bg-black/20 md:bg-black/10" />
+      <main className="relative flex-1 w-full flex items-center justify-center pt-20 overflow-hidden">
+        {/* Cinematic Background */}
+        <img
+          src="/back 1.png"
+          alt="African Adventure"
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/80" />
 
-        {/* Back to Home Button - Adjusted for better mobile placement */}
+        {/* Back to Home */}
         <Link
           to="/"
-          className="absolute top-6 left-6 z-[60] flex items-center gap-2 text-white/70 hover:text-white transition-colors bg-black/40 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 text-xs sm:text-sm font-medium"
+          className="absolute top-28 left-6 z-30 flex items-center gap-2 text-white/50 hover:text-white transition-all bg-white/5 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 text-xs font-black uppercase tracking-widest"
         >
-          <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          <span className="hidden xs:inline">Back to Home</span>
-          <span className="xs:hidden">Home</span>
+          <ArrowLeft className="h-4 w-4" /> Home
         </Link>
 
-        <div
-          className="relative z-10 w-full max-w-[480px] bg-cover bg-center bg-no-repeat rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden"
-          style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url("/auth%201.png")' }}
-        >
-          <div className="text-center mb-6 sm:mb-8">
-            {/* BRANDING LOGO BLOCK - Unified Design */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-8 transform hover:scale-105 transition-transform duration-500 w-full">
-              <img
-                src="/a (2).png"
-                alt="My World Africa Logo"
-                className="h-20 sm:h-28 w-auto object-contain drop-shadow-2xl"
-              />
-              <div className="hidden sm:block w-1 h-20 sm:h-28 bg-accent rounded-full shadow-glow" />
-              <div className="flex flex-col items-center sm:items-start font-sans font-black leading-[0.85] text-2xl sm:text-4xl tracking-tighter uppercase drop-shadow-2xl">
-                <div className="text-white">MY WORLD</div>
-                <div className="text-accent mt-1 sm:mt-2">AFRICA</div>
-              </div>
+        <div className="relative z-10 w-full max-w-[540px] px-4">
+          <div className="bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[3rem] p-8 md:p-12 shadow-[0_50px_100px_-20px_rgba(0,0,0,1)]">
+            <div className="text-center mb-10">
+               {/* Branding */}
+               <div className="flex flex-col items-center gap-4 mb-8">
+                  <img src="/a (2).png" className="h-20 w-auto drop-shadow-glow" alt="Logo" />
+                  <h1 className="font-sans font-black italic text-4xl sm:text-5xl tracking-tighter uppercase leading-[0.8]">
+                    <span className="text-white">MY WORLD</span><br/>
+                    <span className="text-accent">AFRICA</span>
+                  </h1>
+               </div>
+               <p className="text-white/60 font-bold uppercase tracking-widest text-[10px]">
+                 {mode === "signin" ? "Login to your adventure" : "Join the continental tribe"}
+               </p>
             </div>
 
-            <p className="mt-4 sm:mt-6 text-white text-xs sm:text-sm md:text-base font-normal opacity-90">
-              {mode === "signin"
-                ? "Welcome Back! Login to Continue Your Adventure"
-                : "Join the Tribe! Create Your Account to Start Exploring"}
-            </p>
-          </div>
-
-          <form onSubmit={submit} className="space-y-4">
-            {mode === "signup" && (
-              <div className="relative">
-                <Input
-                  id="username"
-                  required
-                  maxLength={50}
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="bg-black/60 border-white/5 h-12 rounded-xl text-white placeholder:text-white/20 pl-5 pr-12 focus-visible:ring-1 focus-visible:ring-[#c15a2b]"
-                />
-                <User className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20" />
-              </div>
-            )}
-
-            <div className="relative">
-              <Input
-                id="email"
-                type="email"
-                required
-                maxLength={100}
-                placeholder={mode === "signin" ? "Email or Username" : "Email Address"}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-black/60 border-white/5 h-12 rounded-xl text-white placeholder:text-white/20 pl-5 pr-12 focus-visible:ring-1 focus-visible:ring-[#c15a2b]"
-              />
-              <User className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20" />
-            </div>
-
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                required
-                minLength={8}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-black/60 border-white/5 h-12 rounded-xl text-white placeholder:text-white/20 pl-12 pr-12 focus-visible:ring-1 focus-visible:ring-[#c15a2b]"
-              />
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20" />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors"
-              >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            </div>
-
-            {mode === "signup" && (
-              <>
-                <div className="relative">
-                  <Input
-                    id="phone"
-                    type="tel"
-                    maxLength={30}
-                    placeholder="Phone number (+254...)"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="bg-black/60 border-white/5 h-12 rounded-xl text-white placeholder:text-white/20 pl-5 pr-12 focus-visible:ring-1 focus-visible:ring-[#c15a2b]"
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-sm font-semibold text-white/70">I am a...</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {roles.map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        onClick={() => setRole(r)}
-                        className={`rounded-xl border h-11 text-xs font-bold transition-all ${
-                          role === r
-                            ? "bg-[#c15a2b] text-white border-transparent shadow-lg shadow-[#c15a2b]/20"
-                            : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
-                        }`}
-                      >
-                        {r}
-                      </button>
-                    ))}
+            <form onSubmit={submit} className="space-y-6">
+              {mode === "signup" ? (
+                <>
+                  <div className="space-y-2">
+                    <div className="relative group">
+                      <Input
+                        required
+                        placeholder="Choose Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-white placeholder:text-white/20 focus:bg-white/10 transition-all"
+                      />
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-accent transition-colors" />
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
-
-            {mode === "signin" && (
-              <div className="flex items-center justify-between px-1">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="remember"
-                    className="h-4 w-4 rounded-sm border-white/30 data-[state=checked]:bg-[#c15a2b] data-[state=checked]:border-none"
+                  <div className="space-y-2">
+                    <div className="relative group">
+                      <Input
+                        type="email"
+                        required
+                        placeholder="Email Address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-white placeholder:text-white/20 focus:bg-white/10 transition-all"
+                      />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-accent transition-colors" />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="relative group">
+                  <Input
+                    required
+                    placeholder="Username or Email"
+                    value={emailOrUsername}
+                    onChange={(e) => setEmailOrUsername(e.target.value)}
+                    className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-white placeholder:text-white/20 focus:bg-white/10 transition-all"
                   />
-                  <label htmlFor="remember" className="text-[11px] text-white/70 font-medium cursor-pointer">
-                    Remember Me
-                  </label>
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-accent transition-colors" />
                 </div>
-                <button type="button" className="text-[11px] text-white/70 hover:text-[#c15a2b] font-medium transition-colors">
-                  Forgot Password?
-                </button>
+              )}
+
+              <div className="space-y-2">
+                <div className="relative group">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-14 bg-white/5 border-white/10 rounded-2xl px-12 text-white placeholder:text-white/20 focus:bg-white/10 transition-all"
+                  />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-accent transition-colors" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
               </div>
-            )}
 
-            <Button
-              type="submit"
-              disabled={busy}
-              className="w-full bg-[#c15a2b] hover:bg-[#c15a2b]/90 text-white font-bold h-12 rounded-xl text-base uppercase tracking-widest transition-all active:scale-[0.98] shadow-lg shadow-[#c15a2b]/20"
-            >
-              {busy ? "PROCESSING..." : mode === "signin" ? "LOGIN" : "SIGN UP"}
-            </Button>
+              {mode === "signup" && (
+                <>
+                  <div className="relative group">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      placeholder="Confirm Strong Password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-white placeholder:text-white/20 focus:bg-white/10 transition-all"
+                    />
+                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-accent transition-colors" />
+                  </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              onClick={signInWithGoogle}
-              disabled={busy}
-              className="w-full h-12 rounded-xl bg-transparent border-white/10 text-white hover:bg-white/5 hover:text-white transition-all font-semibold flex items-center justify-center gap-3"
-            >
-              <svg className="h-5 w-5" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Continue with Google
-            </Button>
-          </form>
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40 text-center">I am a...</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {roles.map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          onClick={() => setRole(r)}
+                          className={`h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${
+                            role === r ? "bg-accent border-accent text-black shadow-lg" : "bg-white/5 border-white/5 text-white/40 hover:bg-white/10"
+                          }`}
+                        >
+                          {r}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
 
-          <div className="mt-8 text-center">
-            <p className="text-sm text-white/60 font-medium">
-              {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}
-              <button
-                type="button"
-                onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-                className="text-[#c15a2b] font-bold hover:underline ml-1"
+              <Button
+                type="submit"
+                disabled={busy}
+                className="w-full h-16 bg-warm-gradient text-primary-foreground font-black uppercase tracking-[0.2em] rounded-2xl shadow-glow transition-all active:scale-95 text-lg"
               >
-                {mode === "signin" ? "Sign Up" : "Sign In"}
+                {busy ? "Processing..." : mode === "signin" ? "Explore Now" : "Join the Tribe"}
+              </Button>
+
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10"></div></div>
+                <div className="relative flex justify-center text-[10px] uppercase font-black text-white/20"><span className="bg-black/0 px-4">Or continue with</span></div>
+              </div>
+
+              <Button
+                type="button"
+                onClick={signInWithGoogle}
+                className="w-full h-14 bg-white text-black hover:bg-white/90 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-transform active:scale-95"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Google
+              </Button>
+            </form>
+
+            <div className="mt-10 text-center">
+              <button
+                onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+                className="text-[10px] font-black uppercase tracking-widest text-accent hover:underline transition-all"
+              >
+                {mode === "signin" ? "New here? Create your story" : "Already a member? Sign in"}
               </button>
-            </p>
+            </div>
           </div>
         </div>
       </main>
@@ -294,5 +290,3 @@ function Auth() {
     </div>
   );
 }
-
-
