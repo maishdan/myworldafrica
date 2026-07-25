@@ -1,111 +1,56 @@
--- FINAL ROBUST SQL SETUP FOR MY WORLD AFRICA
--- Run this in Supabase SQL Editor to fix 400 Errors and Permission Issues
+-- =========================================================
+-- COMPLETE PERMISSIONS FIX FOR MY WORLD AFRICA
+-- Run this in Supabase SQL Editor to resolve "Check Permission" errors
+-- =========================================================
 
--- 1. ENUMS
+-- 1. Ensure Role Enum
 DO $$ BEGIN
     CREATE TYPE public.app_role AS ENUM ('rider', 'driver', 'explorer', 'admin');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
--- 2. PROFILES
-CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  username TEXT UNIQUE,
-  full_name TEXT,
-  email TEXT UNIQUE,
-  avatar_url TEXT,
-  onboarding_complete BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- 3. USER ROLES
-CREATE TABLE IF NOT EXISTS public.user_roles (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  role public.app_role NOT NULL DEFAULT 'explorer',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (user_id, role)
-);
-
--- 4. RLS ENABLING
+-- 2. Profiles Table - Explicit Permissions
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow user update own profile" ON public.profiles;
+CREATE POLICY "Allow user update own profile" ON public.profiles
+  FOR UPDATE USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Allow user insert own profile" ON public.profiles;
+CREATE POLICY "Allow user insert own profile" ON public.profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Allow all read profiles" ON public.profiles;
+CREATE POLICY "Allow all read profiles" ON public.profiles
+  FOR SELECT USING (true);
+
+-- 3. User Roles - Explicit Permissions for Onboarding
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 
--- 5. POLICIES (FIXED FOR ONBOARDING)
-DROP POLICY IF EXISTS "Profiles read by everyone" ON public.profiles;
-CREATE POLICY "Profiles read by everyone" ON public.profiles FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Allow user manage own role" ON public.user_roles;
+CREATE POLICY "Allow user manage own role" ON public.user_roles
+  FOR ALL USING (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS "Users update own profile" ON public.profiles;
-CREATE POLICY "Users update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Admins manage all roles" ON public.user_roles;
+CREATE POLICY "Admins manage all roles" ON public.user_roles
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')
+  );
 
--- Helper Function for Admin check
-CREATE OR REPLACE FUNCTION public.is_admin()
-RETURNS BOOLEAN AS $$
-  SELECT EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin');
-$$ LANGUAGE sql SECURITY DEFINER;
+-- 4. Storage Permissions (For Logos & Images)
+-- Allow anyone to read, but only owners/authenticated to upload to their folders
+CREATE POLICY "Public Read" ON storage.objects FOR SELECT USING (bucket_id = 'event-assets');
+CREATE POLICY "Authenticated Upload" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'event-assets');
 
--- User Roles Policies
-DROP POLICY IF EXISTS "Users read own roles" ON public.user_roles;
-CREATE POLICY "Users read own roles" ON public.user_roles FOR SELECT USING (auth.uid() = user_id OR is_admin());
-
-DROP POLICY IF EXISTS "Users insert own roles" ON public.user_roles;
-CREATE POLICY "Users insert own roles" ON public.user_roles FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-DROP POLICY IF EXISTS "Users update own roles" ON public.user_roles;
-CREATE POLICY "Users update own roles" ON public.user_roles FOR UPDATE USING (auth.uid() = user_id);
-
--- 6. TRIGGER FOR NEW USERS
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.profiles (id, email, full_name, avatar_url, onboarding_complete)
-  VALUES (NEW.id, NEW.email, COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name'), COALESCE(NEW.raw_user_meta_data->>'avatar_url', NEW.raw_user_meta_data->>'picture'), FALSE)
-  ON CONFLICT (id) DO NOTHING;
-
-  INSERT INTO public.user_roles (user_id, role)
-  VALUES (NEW.id, 'explorer')
-  ON CONFLICT (user_id, role) DO NOTHING;
-
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- 7. EVENTS & BOOKINGS (Ensuring they exist)
-CREATE TABLE IF NOT EXISTS public.events (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  creator_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-  title TEXT NOT NULL,
-  description TEXT,
-  logo_url TEXT,
-  images TEXT[] DEFAULT '{}',
-  min_attendees INTEGER DEFAULT 100,
-  max_attendees INTEGER DEFAULT 1000,
-  date DATE NOT NULL,
-  time TIME NOT NULL,
-  location TEXT NOT NULL,
-  is_paid BOOLEAN DEFAULT FALSE,
-  price NUMERIC(10,2) DEFAULT 0,
-  payout_details TEXT,
-  audience TEXT DEFAULT 'All',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS public.bookings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-  event_id UUID REFERENCES public.events(id) ON DELETE CASCADE NOT NULL,
-  ticket_code TEXT UNIQUE NOT NULL,
-  attended BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(user_id, event_id)
-);
-
--- 8. STORAGE
-INSERT INTO storage.buckets (id, name, public) VALUES ('event-assets', 'event-assets', true) ON CONFLICT (id) DO NOTHING;
-
--- 9. GRANTS
+-- 5. GRANTS - Direct access for the frontend
+GRANT ALL ON public.profiles TO authenticated;
+GRANT ALL ON public.user_roles TO authenticated;
+GRANT SELECT ON public.profiles TO anon;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO authenticated;
+
+-- 6. LOGIN BY USERNAME HELPER (Ensuring it's secure)
+CREATE OR REPLACE FUNCTION get_email_from_username(u_name TEXT)
+RETURNS TEXT AS $$
+  SELECT email FROM public.profiles WHERE username = u_name LIMIT 1;
+$$ LANGUAGE sql SECURITY DEFINER SET search_path = public;

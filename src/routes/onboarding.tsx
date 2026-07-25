@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Compass, ShieldCheck, Lock, User, CheckCircle2, Eye, EyeOff, AlertTriangle, CheckCircle } from "lucide-react";
+import { Compass, ShieldCheck, Lock, User, CheckCircle2, Eye, EyeOff, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -70,7 +70,7 @@ function Onboarding() {
     if (!user) return;
 
     if (strength < 5) {
-      toast.error("Password is not strong enough. Add numbers, capital letters, and symbols.");
+      toast.error("Password is not strong enough. Please use symbols, numbers and uppercase letters.");
       return;
     }
 
@@ -81,16 +81,18 @@ function Onboarding() {
 
     setBusy(true);
     try {
-      // 1. Update Password in Supabase Auth
+      // 1. Update Password (handle "same password" error gracefully)
       const { error: pwdErr } = await supabase.auth.updateUser({ password });
-      if (pwdErr) throw pwdErr;
+      if (pwdErr && !pwdErr.message.toLowerCase().includes("different")) {
+        throw pwdErr;
+      }
 
       // 2. Update Role
       const { error: rErr } = await supabase.from("user_roles").upsert({
         user_id: user.id,
         role: role.toLowerCase()
       }, { onConflict: 'user_id,role' });
-      if (rErr) throw rErr;
+      if (rErr) throw new Error(`Role Save Error: ${rErr.message}`);
 
       // 3. Update Profile & Mark Onboarding Complete
       const { error: pErr } = await supabase.from("profiles").update({
@@ -98,14 +100,14 @@ function Onboarding() {
         onboarding_complete: true,
         updated_at: new Date().toISOString(),
       }).eq("id", user.id);
-      if (pErr) throw pErr;
+      if (pErr) throw new Error(`Profile Update Error: ${pErr.message}`);
 
       setFinished(true);
-      toast.success("Identity secured. Welcome to the Tribe.");
+      toast.success("Security Clearance Granted! Welcome to the road.");
       setTimeout(() => nav({ to: "/dashboard" }), 2000);
     } catch (err) {
       console.error(err);
-      toast.error(err instanceof Error ? err.message : "Setup failed. Check permissions.");
+      toast.error(err instanceof Error ? err.message : "System access error. Please run the provided SQL in Supabase.");
     } finally {
       setBusy(false);
     }
@@ -116,8 +118,8 @@ function Onboarding() {
         <div className="min-h-screen bg-black grid place-items-center p-6 text-center">
            <div className="space-y-6 animate-in zoom-in duration-500">
               <CheckCircle2 className="h-24 w-24 text-accent mx-auto" />
-              <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">Welcome to the Tribe!</h1>
-              <p className="text-white/60 font-bold uppercase tracking-widest text-xs">Directing you to headquarters...</p>
+              <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">Mission Control Online!</h1>
+              <p className="text-white/60 font-bold uppercase tracking-widest text-xs">Directing you to your {role.toUpperCase()} Dashboard...</p>
            </div>
         </div>
      );
@@ -132,15 +134,15 @@ function Onboarding() {
       <div className="relative z-10 w-full max-w-lg">
         <div className="bg-black/80 backdrop-blur-3xl border border-white/10 rounded-[3.5rem] p-8 md:p-12 shadow-[0_0_100px_rgba(0,0,0,1)]">
           <header className="text-center mb-10">
-            <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-2">FINAL STEP</h1>
+            <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-2 leading-none">FINAL STEP</h1>
             <p className="text-white/50 text-[10px] uppercase font-black tracking-widest leading-relaxed">
-               Define your identity and join the continental road.
+               Secure your identity and unlock mission control.
             </p>
           </header>
 
           <form onSubmit={submit} className="space-y-6">
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Username</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Unique Username</Label>
               <div className="relative group">
                  <Input required value={username} onChange={(e) => setUsername(e.target.value)} placeholder="AdventureID" className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-white focus:bg-white/10 transition-all" />
                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-accent transition-colors" />
@@ -161,7 +163,7 @@ function Onboarding() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create your mission password"
+                    placeholder="Create your mission key"
                     className={`h-14 bg-white/5 border-white/10 rounded-2xl pl-12 pr-12 text-white focus:bg-white/10 transition-all ${strength > 0 ? (strength >= 5 ? 'border-green-500/50' : 'border-red-500/50') : ''}`}
                  />
                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-accent transition-colors" />
@@ -176,17 +178,25 @@ function Onboarding() {
                   <div key={i} className={`h-full flex-1 transition-all duration-500 ${i < strength ? getStrengthColor() : "bg-transparent"}`} />
                 ))}
               </div>
+
+              {/* Strength requirements list */}
+              <div className="grid grid-cols-2 gap-2 mt-3 px-2">
+                 <Requirement label="8+ Characters" met={password.length >= 8} />
+                 <Requirement label="Contains Number" met={/[0-9]/.test(password)} />
+                 <Requirement label="Capital Letter" met={/[A-Z]/.test(password)} />
+                 <Requirement label="Special Symbol" met={/[!@#$%^&*]/.test(password)} />
+              </div>
             </div>
 
             <div className="space-y-2">
-               <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Confirm Identity Key</Label>
+               <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Confirm Mission Key</Label>
                <div className="relative group">
                   <Input
                     required
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Repeat mission password"
+                    placeholder="Repeat mission key"
                     className={`h-14 bg-white/5 border-white/10 rounded-2xl pl-12 pr-12 text-white focus:bg-white/10 transition-all ${confirmPassword ? (passwordsMatch ? 'border-green-500/50' : 'border-red-500/50') : ''}`}
                   />
                   <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-accent transition-colors" />
@@ -223,11 +233,20 @@ function Onboarding() {
               disabled={busy || !passwordsMatch || strength < 5}
               className="w-full h-20 bg-warm-gradient text-primary-foreground font-black uppercase tracking-[0.2em] rounded-[2.5rem] shadow-glow text-lg transition-all active:scale-95 disabled:opacity-30 disabled:grayscale"
             >
-              {busy ? "Locking Profile..." : "Secure My Identity"}
+              {busy ? "Securing Account..." : "Secure My Identity"}
             </Button>
           </form>
         </div>
       </div>
     </div>
   );
+}
+
+function Requirement({ label, met }: { label: string; met: boolean }) {
+   return (
+      <div className={`flex items-center gap-1.5 text-[8px] font-black uppercase tracking-tight transition-colors ${met ? "text-green-500" : "text-white/10"}`}>
+         {met ? <CheckCircle className="h-2.5 w-2.5" /> : <XCircle className="h-2.5 w-2.5" />}
+         {label}
+      </div>
+   );
 }
