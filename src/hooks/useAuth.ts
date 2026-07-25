@@ -10,7 +10,7 @@ export interface Profile {
   profile_image_url: string | null;
   phone: string | null;
   email: string | null;
-  role: string | null;
+  role?: string | null;
 }
 
 export function useAuth() {
@@ -20,18 +20,25 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchProfileAndRole = async (userId: string) => {
+      const [profileRes, rolesRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", userId).maybeSingle()
+      ]);
+
+      if (profileRes.data) {
+        setProfile({
+          ...profileRes.data,
+          role: rolesRes.data?.role || 'explorer'
+        } as Profile);
+      }
+    };
+
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {
-        setTimeout(() => {
-          supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", s.user.id)
-            .maybeSingle()
-            .then(({ data }) => setProfile(data as Profile | null));
-        }, 0);
+        fetchProfileAndRole(s.user.id);
       } else {
         setProfile(null);
       }
@@ -40,6 +47,9 @@ export function useAuth() {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setUser(data.session?.user ?? null);
+      if (data.session?.user) {
+        fetchProfileAndRole(data.session.user.id);
+      }
       setLoading(false);
     });
 

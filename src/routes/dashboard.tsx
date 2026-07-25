@@ -33,12 +33,23 @@ function Dashboard() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // 1. Fetch Hosted Events
+        // 1. Fetch Hosted Events with booking counts from our view
         const { data: hosted } = await supabase
           .from("events")
-          .select("*, bookings(count)")
+          .select("*")
           .eq("creator_id", user.id);
-        if (hosted) setMyHostedEvents(hosted);
+
+        const { data: statsData } = await supabase
+          .from("event_stats")
+          .select("*");
+
+        if (hosted) {
+          const mergedHosted = hosted.map(h => ({
+            ...h,
+            attendee_count: statsData?.find(s => s.event_id === h.id)?.taken || 0
+          }));
+          setMyHostedEvents(mergedHosted);
+        }
 
         // 2. Fetch Booked Tickets
         const { data: tickets } = await supabase
@@ -48,7 +59,10 @@ function Dashboard() {
         if (tickets) setMyBookedTickets(tickets);
 
         // 3. Stats
-        const rev = hosted?.reduce((acc, curr) => acc + (curr.price * (curr.bookings?.[0]?.count || 0)), 0) || 0;
+        const rev = hosted?.reduce((acc, curr) => {
+          const count = statsData?.find(s => s.event_id === curr.id)?.taken || 0;
+          return acc + (curr.price * count);
+        }, 0) || 0;
         setStats({
           revenue: rev,
           points: (tickets?.filter(t => t.attended).length || 0) * 100,
@@ -178,7 +192,7 @@ function Dashboard() {
                      <div className="flex-1">
                         <h4 className="text-2xl font-black uppercase italic tracking-tighter mb-2">{event.title}</h4>
                         <div className="flex flex-wrap gap-6 text-sm font-bold text-muted-foreground">
-                           <div className="flex items-center gap-2"><Users className="h-4 w-4" /> {event.bookings?.[0]?.count || 0} RSVPs</div>
+                           <div className="flex items-center gap-2"><Users className="h-4 w-4" /> {event.attendee_count} RSVPs</div>
                            <div className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> {event.price === 0 ? "FREE" : `Ksh ${event.price}`}</div>
                            <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /> {event.date}</div>
                         </div>

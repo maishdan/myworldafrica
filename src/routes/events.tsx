@@ -27,11 +27,19 @@ function EventsPage() {
   const [dbEvents, setDbEvents] = useState<any[]>([]);
 
   useEffect(() => {
-    // Attempt to fetch real events from database
+    // Fetch real events and their stats from database
     const fetchEvents = async () => {
-      const { data } = await supabase.from("events").select("*").order("date", { ascending: true });
-      if (data && data.length > 0) {
-        setDbEvents(data);
+      const [eventsRes, statsRes] = await Promise.all([
+        supabase.from("events").select("*").order("date", { ascending: true }),
+        supabase.from("event_stats").select("*")
+      ]);
+
+      if (eventsRes.data) {
+        const merged = eventsRes.data.map(event => ({
+          ...event,
+          taken: statsRes.data?.find(s => s.event_id === event.id)?.taken || 0
+        }));
+        setDbEvents(merged);
       }
     };
     fetchEvents();
