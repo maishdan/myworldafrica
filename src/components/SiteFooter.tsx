@@ -26,8 +26,7 @@ export function SiteFooter() {
             </div>
           </div>
           <p className="mt-4 text-base text-white/80 max-w-sm leading-relaxed font-medium text-center sm:text-left mx-auto sm:mx-0">
-            The community-driven platform for African explorers, riders, and drivers.
-            Share your journey. Host events. Live the road.
+            The ultimate premier tour agency for African safaris, wildlife tours, and mountain trekking. From the Maasai Mara to Mount Kilimanjaro, we help you explore the true heart of Africa.
           </p>
         </div>
         <div>

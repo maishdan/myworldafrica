@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Menu, X, Home } from "lucide-react";
+import { LogOut, Menu, X, Home, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 export function SiteNav() {
   const { user, profile, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const nav = useNavigate();
 
   const handleSignOut = async () => {
@@ -15,6 +17,15 @@ export function SiteNav() {
     toast.success("Signed out");
     nav({ to: "/" });
     setIsMenuOpen(false);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      toast.info(`Searching for: ${searchQuery} in Africa...`);
+      // In a real app, you would navigate to a search results page
+      // nav({ to: `/search?q=${searchQuery}` });
+    }
   };
 
   const NavLinks = () => (
@@ -45,8 +56,8 @@ export function SiteNav() {
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 bg-black border-b border-white/10 shadow-xl">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
           <div className="flex items-center gap-2">
             <img
               src="/a (2).png"
@@ -61,34 +72,33 @@ export function SiteNav() {
           </div>
         </Link>
 
+        {/* Search Bar - Optimized for SEO and UX */}
+        <div className="hidden lg:flex flex-1 max-w-md">
+          <form onSubmit={handleSearch} className="relative w-full">
+            <Input
+              type="text"
+              placeholder="Search African safaris, tours, events..."
+              className="w-full bg-white/5 border-white/10 text-white pl-10 focus:ring-accent focus:border-accent rounded-full text-xs"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+          </form>
+        </div>
+
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-bold uppercase tracking-wider text-white">
+        <nav className="hidden md:flex items-center gap-8 text-sm font-bold uppercase tracking-wider text-white shrink-0">
           <NavLinks />
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-2">
             {user ? (
-              <>
-                <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
-                  {profile?.avatar_url || profile?.profile_image_url ? (
-                    <img
-                      src={profile.avatar_url ?? profile.profile_image_url ?? ""}
-                      alt={profile?.username ?? "You"}
-                      className="h-6 w-6 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-6 w-6 rounded-full bg-warm-gradient grid place-items-center text-primary-foreground text-[10px] font-bold">
-                      {(profile?.username ?? user.email ?? "?").slice(0, 1).toUpperCase()}
-                    </div>
-                  )}
-                  <span className="text-xs font-bold text-white/90">{profile?.username ?? user.email}</span>
-                </div>
-                <Button variant="ghost" size="sm" onClick={handleSignOut} className="h-8 text-white/70 hover:text-destructive hover:bg-white/5">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  <span>Sign out</span>
+              <Link to="/dashboard">
+                <Button variant="outline" size="sm" className="h-10 border-white/10 bg-white/5 text-accent hover:bg-accent hover:text-black font-black uppercase tracking-widest text-[10px] px-6 rounded-xl transition-all">
+                  Dashboard
                 </Button>
-              </>
+              </Link>
             ) : (
               <Link to="/auth">
                 <Button size="sm" className="bg-warm-gradient text-primary-foreground shadow-warm hover:scale-105 transition-transform font-bold px-6">

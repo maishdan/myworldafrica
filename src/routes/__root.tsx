@@ -78,18 +78,36 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "author", content: "MyWorldAfrica" },
+      { name: "author", content: "My World Africa" },
       { name: "theme-color", content: "#c15a2b" },
-      { title: "MyWorldAfrica — Ride, Drive & Explore the Continent" },
-      { property: "og:title", content: "MyWorldAfrica — Ride, Drive & Explore the Continent" },
-      { name: "twitter:title", content: "MyWorldAfrica — Ride, Drive & Explore the Continent" },
-      { name: "description", content: "Community for African riders, drivers and explorers. Share shorts and vlogs, host events, and get PDF tickets delivered instantly." },
-      { property: "og:description", content: "Community for African riders, drivers and explorers. Share shorts and vlogs, host events, and get PDF tickets delivered instantly." },
-      { name: "twitter:description", content: "Community for African riders, drivers and explorers. Share shorts and vlogs, host events, and get PDF tickets delivered instantly." },
+      { title: "My World Africa | Best African Safaris, Tours & Adventure Travel" },
+      { property: "og:title", content: "My World Africa | Best African Safaris, Tours & Adventure Travel" },
+      { name: "twitter:title", content: "My World Africa | Best African Safaris, Tours & Adventure Travel" },
+      {
+        name: "description",
+        content:
+          "Experience the best of Africa with My World Africa. We offer luxury wildlife safaris, Kilimanjaro trekking, Maasai Mara tours, and custom African vacation packages. Discover the heart of Africa with expert local guides and unforgettable adventures.",
+      },
+      {
+        property: "og:description",
+        content:
+          "Experience the best of Africa with My World Africa. We offer luxury wildlife safaris, Kilimanjaro trekking, Maasai Mara tours, and custom African vacation packages. Discover the heart of Africa with expert local guides and unforgettable adventures.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Experience the best of Africa with My World Africa. We offer luxury wildlife safaris, Kilimanjaro trekking, Maasai Mara tours, and custom African vacation packages. Discover the heart of Africa with expert local guides and unforgettable adventures.",
+      },
+      {
+        name: "keywords",
+        content:
+          "Africa travel, African safaris, wildlife tours, Kilimanjaro climbing, Maasai Mara, Serengeti, tourism in Africa, best tour agency Africa, African holidays, adventure travel Africa, safari operator, explore Africa, luxury tours Africa",
+      },
       { property: "og:image", content: "/africa%20logo.png" },
       { name: "twitter:image", content: "/africa%20logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
+      { name: "robots", content: "index, follow" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

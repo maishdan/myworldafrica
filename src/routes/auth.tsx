@@ -153,8 +153,8 @@ function Auth() {
           <ArrowLeft className="h-4 w-4" /> Home
         </Link>
 
-        <div className="relative z-10 w-full max-w-[540px] px-4 py-12">
-          <div className="bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-8 md:p-12 shadow-[0_0_100px_rgba(0,0,0,1)]">
+        <div className="relative z-10 w-full max-w-[540px] px-4 py-12 flex flex-col items-center">
+          <div className="w-full bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-8 md:p-12 shadow-[0_0_100px_rgba(0,0,0,1)]">
             <div className="text-center mb-10">
                <div className="flex flex-col items-center gap-4 mb-8">
                   <img src="/a (2).png" className="h-20 w-auto drop-shadow-glow" alt="Logo" />
@@ -240,7 +240,7 @@ function Auth() {
                         className={`h-14 bg-white/5 border-white/10 rounded-2xl pl-12 pr-12 text-white placeholder:text-white/20 focus:bg-white/10 transition-all ${mode === 'signup' && strength > 0 ? (strength >= 5 ? 'border-green-500/50' : 'border-red-500/50') : ''}`}
                       />
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-accent transition-colors" />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white">
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors">
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
                     </div>
@@ -266,11 +266,14 @@ function Auth() {
                           className={`h-14 bg-white/5 border-white/10 rounded-2xl pl-12 pr-12 text-white focus:bg-white/10 transition-all ${confirmPassword ? (passwordsMatch ? 'border-green-500/50' : 'border-red-500/50') : ''}`}
                         />
                         <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-accent transition-colors" />
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                        <div className="absolute right-12 top-1/2 -translate-y-1/2">
                           {confirmPassword && (
                             passwordsMatch ? <CheckCircle className="h-5 w-5 text-green-500" /> : <AlertTriangle className="h-5 w-5 text-red-500" />
                           )}
                         </div>
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors">
+                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
                       </div>
                     </div>
                   )}
@@ -339,6 +342,37 @@ function Auth() {
                 {mode === "signin" ? "New here? Create your story" : "Already a member? Sign in"}
               </button>
             </div>
+          </div>
+
+          {/* Developer Console - Security Bypass for Testing (MOVED OUTSIDE) */}
+          <div className="mt-12 w-full max-w-sm">
+             <div className="text-center mb-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-[8px] font-black uppercase tracking-widest text-red-500 backdrop-blur-sm">
+                  <ShieldCheck className="h-3 w-3" /> Developer Bypass Active
+                </div>
+             </div>
+             <div className="grid grid-cols-2 gap-3 px-4">
+                <Link to="/dashboard" search={{ mock_role: 'admin' }}>
+                  <Button variant="outline" className="w-full h-10 rounded-xl border-white/10 bg-black/40 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-accent transition-all backdrop-blur-md">
+                    GM Console
+                  </Button>
+                </Link>
+                <Link to="/dashboard" search={{ mock_role: 'rider' }}>
+                  <Button variant="outline" className="w-full h-10 rounded-xl border-white/10 bg-black/40 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-accent transition-all backdrop-blur-md">
+                    Rider View
+                  </Button>
+                </Link>
+                <Link to="/dashboard" search={{ mock_role: 'driver' }}>
+                  <Button variant="outline" className="w-full h-10 rounded-xl border-white/10 bg-black/40 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-accent transition-all backdrop-blur-md">
+                    Driver View
+                  </Button>
+                </Link>
+                <Link to="/dashboard" search={{ mock_role: 'explorer' }}>
+                  <Button variant="outline" className="w-full h-10 rounded-xl border-white/10 bg-black/40 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-accent transition-all backdrop-blur-md">
+                    Explorer Hub
+                  </Button>
+                </Link>
+             </div>
           </div>
         </div>
       </main>

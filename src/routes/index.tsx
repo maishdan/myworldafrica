@@ -11,16 +11,26 @@ import { events } from "@/lib/mockData";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "MyWorldAfrica — Ride, Drive & Explore the Continent" },
+      { title: "My World Africa | Best African Safaris, Tours & Adventure Travel" },
       {
         name: "description",
         content:
-          "Community for African riders, drivers and explorers. Share shorts and vlogs, host events, and get PDF tickets delivered instantly.",
+          "Discover the heart of Africa with My World Africa. We offer premier wildlife safaris, Kilimanjaro trekking, Maasai Mara tours, and authentic cultural experiences across 54 countries. Book your perfect African adventure today!",
       },
-      { property: "og:title", content: "MyWorldAfrica — Ride, Drive & Explore the Continent" },
-      { property: "og:description", content: "Community for African riders, drivers and explorers." },
+      { property: "og:title", content: "My World Africa | Best African Safaris, Tours & Adventure Travel" },
+      {
+        property: "og:description",
+        content:
+          "Discover the heart of Africa with My World Africa. We offer premier wildlife safaris, Kilimanjaro trekking, Maasai Mara tours, and authentic cultural experiences.",
+      },
+      {
+        name: "keywords",
+        content:
+          "Africa tourism, African safaris, wildlife tours, travel to Africa, best tour agency in Africa, Maasai Mara tours, Kilimanjaro trekking, Serengeti safaris, African adventures, explore Africa, luxury African travel",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "robots", content: "index, follow" },
     ],
   }),
   component: Landing,
@@ -44,16 +54,6 @@ function Landing() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent hidden lg:block" />
 
         <div className="relative z-10 mx-auto max-w-7xl px-6 pt-24 pb-16 min-h-screen flex flex-col justify-center items-center">
-          {/* Floating Element at Absolute Furthest Top Right */}
-          <div className="absolute top-24 right-2 sm:right-6 md:right-10 w-24 sm:w-32 md:w-44 lg:w-56 animate-float pointer-events-none z-20">
-            <div className="relative rounded-full overflow-hidden aspect-square animate-rainbow-glow border-2 border-white/20">
-              <img
-                src="/Circular.png"
-                alt="Circular Branding"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
 
           <div className="w-full max-w-5xl flex flex-col items-center text-center">
             {/* BRANDING LOGO BLOCK - Centered & Bold */}
@@ -76,13 +76,12 @@ function Landing() {
             </div>
 
             <h1 className="font-display text-white text-3xl sm:text-6xl md:text-7xl font-black italic uppercase leading-[1] max-w-4xl drop-shadow-2xl px-4 tracking-tighter">
-              Ride the road. <br />
-              <span className="text-gradient-warm">Own the story.</span>
+              Discover the Best <br />
+              <span className="text-gradient-warm">African Safaris & Tours.</span>
             </h1>
 
             <p className="mt-8 text-base sm:text-xl md:text-2xl text-white/90 max-w-2xl leading-relaxed drop-shadow-lg font-medium px-6">
-              The premium hub for African explorers. Post vertical memories,
-              rally your group, and secure tickets for the continent\u0027s greatest adventures.
+              My World Africa is your ultimate guide to exploring the continent. From luxury wildlife safaris in the Maasai Mara and Serengeti to trekking Mount Kilimanjaro and Mount Kenya, we curate perfect tours across all 54 African countries.
             </p>
 
             <div className="mt-12 flex flex-col sm:flex-row gap-6 w-full justify-center px-8">
