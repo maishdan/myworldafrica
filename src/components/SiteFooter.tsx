@@ -15,7 +15,7 @@ export function SiteFooter() {
         <div className="md:col-span-2">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-4 mb-8 group text-center sm:text-left">
             <img
-              src="/a (2).png"
+              src="/logo.png"
               alt="My World Africa Logo"
               className="h-16 sm:h-24 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
             />

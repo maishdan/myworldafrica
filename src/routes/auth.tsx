@@ -9,6 +9,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { adminSignUp } from "@/lib/auth.functions";
+
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -89,22 +91,20 @@ function Auth() {
         if (strength < 5) throw new Error("Password is not strong enough.");
         if (!passwordsMatch) throw new Error("Passwords do not match");
 
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: {
-              username,
-              role: role.toLowerCase(),
-            },
-          },
+        // Created server-side (email pre-confirmed) so signup never depends on SMTP.
+        await adminSignUp({
+          data: { email, password, username, role: role.toLowerCase() as "rider" | "driver" | "explorer" },
         });
-        if (error) throw error;
-        toast.success("Account created!", {
-          description: "Check your email to confirm your account and start your adventure.",
-        });
+
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInErr) throw signInErr;
+
+        toast.success("Account created! Welcome to the tribe.");
+        nav({ to: "/onboarding" });
+        return;
+
       } else if (mode === "signin") {
+
         let loginEmail = emailOrUsername;
         if (!emailOrUsername.includes("@")) {
           const { data, error } = await supabase.rpc('get_email_from_username', { u_name: emailOrUsername });
@@ -157,7 +157,7 @@ function Auth() {
           <div className="w-full bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-8 md:p-12 shadow-[0_0_100px_rgba(0,0,0,1)]">
             <div className="text-center mb-10">
                <div className="flex flex-col items-center gap-4 mb-8">
-                  <img src="/a (2).png" className="h-20 w-auto drop-shadow-glow" alt="Logo" />
+                  <img src="/logo.png" className="h-20 w-auto drop-shadow-glow" alt="Logo" />
                   <h1 className="font-sans font-black italic text-4xl sm:text-5xl tracking-tighter uppercase leading-[0.8]">
                     <span className="text-white">MY WORLD</span><br/>
                     <span className="text-accent">AFRICA</span>

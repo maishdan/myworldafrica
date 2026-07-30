@@ -89,7 +89,7 @@ export function SiteNav() {
         <Link to="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
           <div className="flex items-center gap-2">
             <img
-              src="/a (2).png"
+              src="/logo.png"
               alt="My World Africa"
               className="h-8 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105"
             />
@@ -242,7 +242,7 @@ export function SiteNav() {
             {/* Logo branding - Increased visibility */}
             <div className="relative z-10 flex items-center justify-center gap-3 transform scale-125 mb-4">
               <img
-                src="/a (2).png"
+                src="/logo.png"
                 alt="My World Africa Logo"
                 className="h-12 w-auto object-contain"
               />
