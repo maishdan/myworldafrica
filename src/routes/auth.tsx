@@ -89,7 +89,7 @@ function Auth() {
         if (strength < 5) throw new Error("Password is not strong enough.");
         if (!passwordsMatch) throw new Error("Passwords do not match");
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -100,11 +100,36 @@ function Auth() {
             },
           },
         });
-        if (error) throw error;
+
+        if (error) {
+          const msg = error.message.toLowerCase();
+          // Supabase returns a 500 "Error sending confirmation email" when SMTP
+          // is misconfigured — the account is usually created anyway, so try to log in.
+          if (msg.includes("email") && (msg.includes("sending") || msg.includes("confirmation"))) {
+            const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+            if (signInErr) {
+              throw new Error(
+                "Account created but the confirmation email could not be sent. Disable 'Confirm email' (or fix SMTP) in Supabase → Authentication → Providers → Email, then sign in.",
+              );
+            }
+            toast.success("Account created! Welcome to the tribe.");
+            nav({ to: "/onboarding" });
+            return;
+          }
+          throw error;
+        }
+
+        if (data.session) {
+          toast.success("Account created! Welcome to the tribe.");
+          nav({ to: "/onboarding" });
+          return;
+        }
+
         toast.success("Account created!", {
           description: "Check your email to confirm your account and start your adventure.",
         });
       } else if (mode === "signin") {
+
         let loginEmail = emailOrUsername;
         if (!emailOrUsername.includes("@")) {
           const { data, error } = await supabase.rpc('get_email_from_username', { u_name: emailOrUsername });
