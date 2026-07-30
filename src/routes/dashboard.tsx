@@ -34,56 +34,85 @@ function Dashboard() {
   const [stats, setStats] = useState({ revenue: 0, points: 0, attended: 0, distance: 1240 });
 
   useEffect(() => {
-    if (!user && !mock_role && !authLoading) {
+    if (mock_role) {
+      setLoading(false);
+      return;
+    }
+    if (authLoading) return;
+    if (!user) {
       nav({ to: "/auth" });
       return;
     }
 
+    const uid = user.id;
+
     const fetchData = async () => {
-      if (mock_role) {
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       try {
-        const { data: hosted } = await supabase.from("events").select("*").eq("creator_id", user.id);
+        const { data: hosted, error: hostedErr } = await supabase
+          .from("events")
+          .select("*")
+          .eq("creator_id", uid);
+        if (hostedErr) console.error("events:", hostedErr.message);
+
         const { data: statsData } = await supabase.from("event_stats").select("*");
 
-        if (hosted) {
-          setMyHostedEvents(hosted.map(h => ({
+        setMyHostedEvents(
+          (hosted ?? []).map((h) => ({
             ...h,
-            attendee_count: statsData?.find(s => s.event_id === h.id)?.taken || 0
-          })));
-        }
+            attendee_count: statsData?.find((s) => s.event_id === h.id)?.taken || 0,
+          })),
+        );
 
-        const { data: tickets } = await supabase.from("bookings").select("*, events(*)").eq("user_id", user.id);
-        if (tickets) setMyBookedTickets(tickets);
+        const { data: tickets, error: ticketsErr } = await supabase
+          .from("bookings")
+          .select("*, events(*)")
+          .eq("user_id", uid);
+        if (ticketsErr) console.error("bookings:", ticketsErr.message);
+        setMyBookedTickets(tickets ?? []);
 
-        const rev = hosted?.reduce((acc, curr) => acc + (Number(curr.price) * (statsData?.find(s => s.event_id === curr.id)?.taken || 0)), 0) || 0;
+        const rev =
+          hosted?.reduce(
+            (acc, curr) =>
+              acc + Number(curr.price || 0) * (statsData?.find((s) => s.event_id === curr.id)?.taken || 0),
+            0,
+          ) || 0;
+        const attended = tickets?.filter((t) => t.attended).length || 0;
         setStats({
           revenue: rev,
-          points: (tickets?.filter(t => t.attended).length || 0) * 100 + 50,
-          attended: tickets?.filter(t => t.attended).length || 0,
-          distance: (tickets?.filter(t => t.attended).length || 0) * 450 + 120
+          points: attended * 100 + 50,
+          attended,
+          distance: attended * 450 + 120,
         });
 
         if (profile?.role === "admin") {
           const [usersRes, eventsRes] = await Promise.all([
             supabase.from("profiles").select("*"),
-            supabase.from("events").select("*, profiles(username)")
+            supabase.from("events").select("*, profiles(username)"),
           ]);
-          if (usersRes.data) setAllUsers(usersRes.data);
-          if (eventsRes.data) setAllEvents(eventsRes.data);
+          setAllUsers(usersRes.data ?? []);
+          setAllEvents(eventsRes.data ?? []);
           setSystemStats({
             totalUsers: usersRes.data?.length || 0,
             totalEvents: eventsRes.data?.length || 0,
-            globalRevenue: eventsRes.data?.reduce((acc, curr) => acc + (Number(curr.price) * (statsData?.find(s => s.event_id === curr.id)?.taken || 0)), 0) || 0
+            globalRevenue:
+              eventsRes.data?.reduce(
+                (acc, curr) =>
+                  acc +
+                  Number(curr.price || 0) * (statsData?.find((s) => s.event_id === curr.id)?.taken || 0),
+                0,
+              ) || 0,
           });
         }
-      } catch (err) { console.error(err); } finally { setLoading(false); }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
-  }, [user, profile, nav]);
+  }, [user, profile, authLoading, mock_role, nav]);
+
 
   const handleSignOut = async () => {
     await signOut();
