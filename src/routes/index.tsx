@@ -59,7 +59,7 @@ function Landing() {
             {/* BRANDING LOGO BLOCK - Centered & Bold */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 mb-12 transform hover:scale-105 transition-transform duration-700 w-full px-4">
               <img
-                src="/a (2).png"
+                src="/logo.png"
                 alt="My World Africa Logo"
                 className="h-32 sm:h-48 md:h-64 lg:h-80 w-auto object-contain drop-shadow-2xl"
               />

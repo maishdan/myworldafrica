@@ -42,7 +42,7 @@ function EventBookingPage() {
           price: 0,
           is_paid: false,
           audience: "All",
-          logo_url: "/a (2).png",
+          logo_url: "/logo.png",
           images: ["/back 1.png", "/backg2.png", "/all.png"]
         });
       }
@@ -108,7 +108,7 @@ function EventBookingPage() {
             <div className="flex-1">
                <div className="flex items-center gap-4 mb-6">
                   <div className="h-20 w-20 rounded-3xl bg-white p-3 shadow-2xl">
-                    <img src={event.logo_url || "/a (2).png"} className="w-full h-full object-contain" alt="Logo" />
+                    <img src={event.logo_url || "/logo.png"} className="w-full h-full object-contain" alt="Logo" />
                   </div>
                   <div className="text-white text-xs uppercase tracking-[0.3em] font-black bg-primary px-4 py-1.5 rounded-full shadow-lg">
                     {event.audience} Group Event

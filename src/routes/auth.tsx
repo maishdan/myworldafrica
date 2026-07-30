@@ -89,7 +89,7 @@ function Auth() {
         if (strength < 5) throw new Error("Password is not strong enough.");
         if (!passwordsMatch) throw new Error("Passwords do not match");
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -100,11 +100,36 @@ function Auth() {
             },
           },
         });
-        if (error) throw error;
+
+        if (error) {
+          const msg = error.message.toLowerCase();
+          // Supabase returns a 500 "Error sending confirmation email" when SMTP
+          // is misconfigured — the account is usually created anyway, so try to log in.
+          if (msg.includes("email") && (msg.includes("sending") || msg.includes("confirmation"))) {
+            const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+            if (signInErr) {
+              throw new Error(
+                "Account created but the confirmation email could not be sent. Disable 'Confirm email' (or fix SMTP) in Supabase → Authentication → Providers → Email, then sign in.",
+              );
+            }
+            toast.success("Account created! Welcome to the tribe.");
+            nav({ to: "/onboarding" });
+            return;
+          }
+          throw error;
+        }
+
+        if (data.session) {
+          toast.success("Account created! Welcome to the tribe.");
+          nav({ to: "/onboarding" });
+          return;
+        }
+
         toast.success("Account created!", {
           description: "Check your email to confirm your account and start your adventure.",
         });
       } else if (mode === "signin") {
+
         let loginEmail = emailOrUsername;
         if (!emailOrUsername.includes("@")) {
           const { data, error } = await supabase.rpc('get_email_from_username', { u_name: emailOrUsername });
@@ -157,7 +182,7 @@ function Auth() {
           <div className="w-full bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-8 md:p-12 shadow-[0_0_100px_rgba(0,0,0,1)]">
             <div className="text-center mb-10">
                <div className="flex flex-col items-center gap-4 mb-8">
-                  <img src="/a (2).png" className="h-20 w-auto drop-shadow-glow" alt="Logo" />
+                  <img src="/logo.png" className="h-20 w-auto drop-shadow-glow" alt="Logo" />
                   <h1 className="font-sans font-black italic text-4xl sm:text-5xl tracking-tighter uppercase leading-[0.8]">
                     <span className="text-white">MY WORLD</span><br/>
                     <span className="text-accent">AFRICA</span>
