@@ -352,7 +352,7 @@ function TicketCard({ ticket, role }: any) {
                <div className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-white/10 ${ticket.attended ? 'text-green-500 bg-green-500/10' : 'text-accent bg-accent/10'}`}>
                   {ticket.attended ? "MISSION COMPLETE" : "UPCOMING MISSION"}
                </div>
-               <img src={ticket.events?.logo_url || "/a (2).png"} className="h-8 w-auto opacity-30 group-hover:opacity-100 transition-opacity" alt="" />
+               <img src={ticket.events?.logo_url || "/logo.png"} className="h-8 w-auto opacity-30 group-hover:opacity-100 transition-opacity" alt="" />
             </div>
             <h4 className="text-xl font-black uppercase italic tracking-tighter mb-4 leading-none">{ticket.events?.title}</h4>
             <div className="flex flex-wrap items-center gap-4 text-[10px] font-black uppercase tracking-widest text-white/30">

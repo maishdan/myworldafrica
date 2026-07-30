@@ -157,7 +157,7 @@ function Auth() {
           <div className="w-full bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-8 md:p-12 shadow-[0_0_100px_rgba(0,0,0,1)]">
             <div className="text-center mb-10">
                <div className="flex flex-col items-center gap-4 mb-8">
-                  <img src="/a (2).png" className="h-20 w-auto drop-shadow-glow" alt="Logo" />
+                  <img src="/logo.png" className="h-20 w-auto drop-shadow-glow" alt="Logo" />
                   <h1 className="font-sans font-black italic text-4xl sm:text-5xl tracking-tighter uppercase leading-[0.8]">
                     <span className="text-white">MY WORLD</span><br/>
                     <span className="text-accent">AFRICA</span>
