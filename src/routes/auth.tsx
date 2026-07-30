@@ -9,6 +9,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { adminSignUp } from "@/lib/auth.functions";
+
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -89,45 +91,18 @@ function Auth() {
         if (strength < 5) throw new Error("Password is not strong enough.");
         if (!passwordsMatch) throw new Error("Passwords do not match");
 
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: {
-              username,
-              role: role.toLowerCase(),
-            },
-          },
+        // Created server-side (email pre-confirmed) so signup never depends on SMTP.
+        await adminSignUp({
+          data: { email, password, username, role: role.toLowerCase() as "rider" | "driver" | "explorer" },
         });
 
-        if (error) {
-          const msg = error.message.toLowerCase();
-          // Supabase returns a 500 "Error sending confirmation email" when SMTP
-          // is misconfigured — the account is usually created anyway, so try to log in.
-          if (msg.includes("email") && (msg.includes("sending") || msg.includes("confirmation"))) {
-            const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
-            if (signInErr) {
-              throw new Error(
-                "Account created but the confirmation email could not be sent. Disable 'Confirm email' (or fix SMTP) in Supabase → Authentication → Providers → Email, then sign in.",
-              );
-            }
-            toast.success("Account created! Welcome to the tribe.");
-            nav({ to: "/onboarding" });
-            return;
-          }
-          throw error;
-        }
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInErr) throw signInErr;
 
-        if (data.session) {
-          toast.success("Account created! Welcome to the tribe.");
-          nav({ to: "/onboarding" });
-          return;
-        }
+        toast.success("Account created! Welcome to the tribe.");
+        nav({ to: "/onboarding" });
+        return;
 
-        toast.success("Account created!", {
-          description: "Check your email to confirm your account and start your adventure.",
-        });
       } else if (mode === "signin") {
 
         let loginEmail = emailOrUsername;
