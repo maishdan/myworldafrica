@@ -76,11 +76,13 @@ function Auth() {
         if (!profile.onboarding_complete) {
           nav({ to: "/onboarding" });
         } else {
-          nav({ to: "/dashboard" });
+          // If we have a redirect param, go there, otherwise go to dashboard
+          const target = redirect && redirect !== "/dashboard" ? redirect : "/dashboard";
+          nav({ to: target as any });
         }
       }
     });
-  }, [profile, nav]);
+  }, [profile, nav, redirect]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -342,37 +344,6 @@ function Auth() {
                 {mode === "signin" ? "New here? Create your story" : "Already a member? Sign in"}
               </button>
             </div>
-          </div>
-
-          {/* Developer Console - Security Bypass for Testing (MOVED OUTSIDE) */}
-          <div className="mt-12 w-full max-w-sm">
-             <div className="text-center mb-6">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-[8px] font-black uppercase tracking-widest text-red-500 backdrop-blur-sm">
-                  <ShieldCheck className="h-3 w-3" /> Developer Bypass Active
-                </div>
-             </div>
-             <div className="grid grid-cols-2 gap-3 px-4">
-                <Link to="/dashboard" search={{ mock_role: 'admin' }}>
-                  <Button variant="outline" className="w-full h-10 rounded-xl border-white/10 bg-black/40 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-accent transition-all backdrop-blur-md">
-                    GM Console
-                  </Button>
-                </Link>
-                <Link to="/dashboard" search={{ mock_role: 'rider' }}>
-                  <Button variant="outline" className="w-full h-10 rounded-xl border-white/10 bg-black/40 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-accent transition-all backdrop-blur-md">
-                    Rider View
-                  </Button>
-                </Link>
-                <Link to="/dashboard" search={{ mock_role: 'driver' }}>
-                  <Button variant="outline" className="w-full h-10 rounded-xl border-white/10 bg-black/40 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-accent transition-all backdrop-blur-md">
-                    Driver View
-                  </Button>
-                </Link>
-                <Link to="/dashboard" search={{ mock_role: 'explorer' }}>
-                  <Button variant="outline" className="w-full h-10 rounded-xl border-white/10 bg-black/40 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-accent transition-all backdrop-blur-md">
-                    Explorer Hub
-                  </Button>
-                </Link>
-             </div>
           </div>
         </div>
       </main>

@@ -9,16 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard")({
-  validateSearch: (search: Record<string, unknown>) => {
-    return {
-      mock_role: (search.mock_role as string) || undefined,
-    };
-  },
   component: Dashboard,
 });
 
 function Dashboard() {
-  const { mock_role } = Route.useSearch();
   const { user, profile, signOut, loading: authLoading } = useAuth();
   const nav = useNavigate();
   const [activeTab, setActiveTab] = useState<"overview" | "events" | "tickets" | "admin" | "discovery">("overview");
@@ -34,13 +28,10 @@ function Dashboard() {
   const [stats, setStats] = useState({ revenue: 0, points: 0, attended: 0, distance: 1240 });
 
   useEffect(() => {
-    if (mock_role) {
-      setLoading(false);
-      return;
-    }
     if (authLoading) return;
     if (!user) {
-      nav({ to: "/auth" });
+      toast.error("Access Denied: Please login to access the dashboard");
+      nav({ to: "/auth", search: { redirect: "/dashboard" } });
       return;
     }
 
@@ -120,9 +111,9 @@ function Dashboard() {
     nav({ to: "/" });
   };
 
-  if ((!user && !mock_role) || (loading && !mock_role)) return <div className="min-h-screen grid place-items-center bg-black"><div className="animate-spin h-12 w-12 border-4 border-accent border-t-transparent rounded-full shadow-[0_0_20px_rgba(255,165,0,0.5)]" /></div>;
+  if (!user || loading) return <div className="min-h-screen grid place-items-center bg-black"><div className="animate-spin h-12 w-12 border-4 border-accent border-t-transparent rounded-full shadow-[0_0_20px_rgba(255,165,0,0.5)]" /></div>;
 
-  const role = mock_role || profile?.role || "explorer";
+  const role = profile?.role || "explorer";
   const isAdmin = role === "admin";
   const isRider = role === "rider";
   const isDriver = role === "driver";

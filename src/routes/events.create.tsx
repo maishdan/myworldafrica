@@ -49,7 +49,7 @@ function CreateEvent() {
 
   useEffect(() => {
     if (!user && !busy) {
-      toast.error("Please sign in to host an event");
+      toast.error("Access Denied: Please sign in to host an event");
       nav({ to: "/auth", search: { redirect: "/events/create" } });
     }
   }, [user, nav, busy]);
