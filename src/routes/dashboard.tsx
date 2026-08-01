@@ -102,7 +102,7 @@ function Dashboard() {
       }
     };
     fetchData();
-  }, [user, profile, authLoading, mock_role, nav]);
+  }, [user, profile, authLoading, nav]);
 
 
   const handleSignOut = async () => {
