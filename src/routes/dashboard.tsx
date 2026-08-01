@@ -18,6 +18,7 @@ function Dashboard() {
   const [activeTab, setActiveTab] = useState<"overview" | "events" | "tickets" | "admin" | "discovery">("overview");
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [reload, setReload] = useState(0);
 
   // Data State
   const [myHostedEvents, setMyHostedEvents] = useState<any[]>([]);
@@ -26,6 +27,11 @@ function Dashboard() {
   const [allEvents, setAllEvents] = useState<any[]>([]);
   const [systemStats, setSystemStats] = useState({ totalUsers: 0, totalEvents: 0, globalRevenue: 0 });
   const [stats, setStats] = useState({ revenue: 0, points: 0, attended: 0, distance: 1240 });
+
+  // RSVP viewer
+  const [rsvpEvent, setRsvpEvent] = useState<any | null>(null);
+  const [rsvpRows, setRsvpRows] = useState<any[]>([]);
+  const [rsvpLoading, setRsvpLoading] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
