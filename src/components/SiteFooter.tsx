@@ -89,3 +89,16 @@ export function SiteFooter() {
     </footer>
   );
 }
+
+function FooterLink({ to, children }: { to: string; children: React.ReactNode }) {
+  return (
+    <li>
+      <Link
+        to={to}
+        className="hover:text-white transition-colors flex items-center gap-2"
+      >
+        <span className="h-1 w-1 bg-accent rounded-full" /> {children}
+      </Link>
+    </li>
+  );
+}
