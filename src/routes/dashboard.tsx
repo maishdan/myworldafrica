@@ -314,10 +314,21 @@ function Dashboard() {
 
              {activeTab === "events" && (
                 <div className="space-y-6">
-                   {myHostedEvents.map(e => (
-                      <HostedEventRow key={e.id} event={e} />
+                   <div className="flex flex-wrap items-center justify-between gap-4">
+                      <h3 className="text-2xl font-black uppercase italic tracking-tighter">
+                         {isAdmin ? "Every event on the platform" : "Events you host"}
+                      </h3>
+                      <div className="flex gap-3">
+                         <Button variant="outline" onClick={() => setReload(n => n + 1)} className="rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest border-white/10 hover:bg-white/10">Refresh</Button>
+                         <Link to="/events/create">
+                            <Button className="bg-accent text-black rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest">Host new event</Button>
+                         </Link>
+                      </div>
+                   </div>
+                   {(isAdmin ? allEvents : myHostedEvents).map(e => (
+                      <HostedEventRow key={e.id} event={e} onManage={() => openRsvps(e)} onDelete={() => deleteEvent(e)} />
                    ))}
-                   {myHostedEvents.length === 0 && <EmptyState message="You haven\u0027t rallied the tribe yet." />}
+                   {(isAdmin ? allEvents : myHostedEvents).length === 0 && <EmptyState message={isAdmin ? "No events published yet." : "You haven\u0027t rallied the tribe yet."} />}
                 </div>
              )}
 
@@ -329,14 +340,63 @@ function Dashboard() {
                       <StatTile label="Global Revenue" value={`Ksh ${systemStats.globalRevenue}`} icon={DollarSign} color="text-green-400" />
                    </div>
 
-                   <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl overflow-x-auto">
+                   {/* ALL EVENTS */}
+                   <div className="space-y-6">
+                      <div className="flex flex-wrap items-center justify-between gap-4">
+                         <h3 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-4">
+                            <span className="w-12 h-1 bg-accent rounded-full" /> Hosted events
+                         </h3>
+                         <Link to="/events/create">
+                            <Button className="bg-warm-gradient text-black rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest shadow-glow">Host event</Button>
+                         </Link>
+                      </div>
+                      <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl overflow-x-auto">
+                         <table className="w-full text-left border-collapse min-w-[720px]">
+                            <thead className="bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+                               <tr>
+                                  <th className="px-8 py-6">Event</th>
+                                  <th className="px-8 py-6">Host</th>
+                                  <th className="px-8 py-6">RSVPs</th>
+                                  <th className="px-8 py-6">Price</th>
+                                  <th className="px-8 py-6 text-right">Control</th>
+                               </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                               {allEvents.map(e => (
+                                  <tr key={e.id} className="hover:bg-white/5 transition-all text-sm font-bold">
+                                     <td className="px-8 py-6">
+                                        <div className="text-white uppercase italic tracking-tighter text-lg leading-none">{e.title}</div>
+                                        <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1">{e.date} · {e.location}</div>
+                                     </td>
+                                     <td className="px-8 py-6 text-white/60 text-xs uppercase tracking-widest">{e.profiles?.username || "—"}</td>
+                                     <td className="px-8 py-6 text-accent">{e.attendee_count}</td>
+                                     <td className="px-8 py-6 text-white/60 text-xs">{Number(e.price) === 0 ? "FREE" : `Ksh ${e.price}`}</td>
+                                     <td className="px-8 py-6 text-right whitespace-nowrap">
+                                        <Button variant="ghost" size="sm" onClick={() => openRsvps(e)} className="rounded-xl text-[10px] font-black uppercase tracking-widest hover:text-accent">RSVPs</Button>
+                                        <Button variant="ghost" size="sm" onClick={() => deleteEvent(e)} className="text-red-500/50 hover:text-red-500 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
+                                     </td>
+                                  </tr>
+                               ))}
+                               {allEvents.length === 0 && (
+                                  <tr><td colSpan={5} className="px-8 py-12 text-center text-white/30 font-black uppercase tracking-widest text-xs">No events yet</td></tr>
+                               )}
+                            </tbody>
+                         </table>
+                      </div>
+                   </div>
+
+                   {/* ALL USERS */}
+                   <div className="space-y-6">
+                      <h3 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-4">
+                         <span className="w-12 h-1 bg-accent rounded-full" /> Operatives
+                      </h3>
+                      <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl overflow-x-auto">
                       <table className="w-full text-left border-collapse min-w-[600px]">
                          <thead className="bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
                             <tr>
                                <th className="px-8 py-6">Operative</th>
-                               <th className="px-8 py-6">Specialization</th>
+                               <th className="px-8 py-6">Phone</th>
                                <th className="px-8 py-6">Joined</th>
-                               <th className="px-8 py-6 text-right">Control</th>
                             </tr>
                          </thead>
                          <tbody className="divide-y divide-white/5">
@@ -346,20 +406,17 @@ function Dashboard() {
                                      <div className="text-white uppercase italic tracking-tighter text-lg leading-none">{u.username}</div>
                                      <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1">{u.email}</div>
                                   </td>
-                                  <td className="px-8 py-6">
-                                     <span className="text-[9px] font-black uppercase tracking-widest border border-white/20 px-3 py-1 rounded-full">{u.role}</span>
-                                  </td>
-                                  <td className="px-8 py-6 text-white/40 text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
-                                  <td className="px-8 py-6 text-right">
-                                     <Button variant="ghost" size="sm" className="text-red-500/40 hover:text-red-500 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
-                                  </td>
+                                  <td className="px-8 py-6 text-white/50 text-xs">{u.phone || "—"}</td>
+                                  <td className="px-8 py-6 text-white/40 text-xs">{u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}</td>
                                </tr>
                             ))}
                          </tbody>
                       </table>
+                      </div>
                    </div>
                 </div>
              )}
+
           </div>
         </main>
       </div>
