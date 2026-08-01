@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Menu, X, Home, Search, Calendar, MapPin, Play } from "lucide-react";
+import { LogOut, Menu, X, Search, Calendar, MapPin, Play, Phone, Mail, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { events, shorts } from "@/lib/mockData";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { CONTACT, telHref, smsHref, whatsappHref, mailHref } from "@/lib/contact";
 
 export function SiteNav() {
   const { user, profile, signOut } = useAuth();
