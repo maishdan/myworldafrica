@@ -85,10 +85,17 @@ function Dashboard() {
         if (profile?.role === "admin") {
           const [usersRes, eventsRes] = await Promise.all([
             supabase.from("profiles").select("*"),
-            supabase.from("events").select("*, profiles(username)"),
+            supabase.from("events").select("*, profiles(username)").order("created_at", { ascending: false }),
           ]);
+          if (usersRes.error) console.error("profiles:", usersRes.error.message);
+          if (eventsRes.error) console.error("all events:", eventsRes.error.message);
           setAllUsers(usersRes.data ?? []);
-          setAllEvents(eventsRes.data ?? []);
+          setAllEvents(
+            (eventsRes.data ?? []).map((e) => ({
+              ...e,
+              attendee_count: statsData?.find((s) => s.event_id === e.id)?.taken || 0,
+            })),
+          );
           setSystemStats({
             totalUsers: usersRes.data?.length || 0,
             totalEvents: eventsRes.data?.length || 0,
