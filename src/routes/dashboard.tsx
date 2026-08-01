@@ -108,14 +108,43 @@ function Dashboard() {
       }
     };
     fetchData();
-  }, [user, profile, authLoading, nav]);
+  }, [user, profile, authLoading, nav, reload]);
 
+  const openRsvps = async (event: any) => {
+    setRsvpEvent(event);
+    setRsvpRows([]);
+    setRsvpLoading(true);
+    const { data, error } = await supabase
+      .from("bookings")
+      .select("*, profiles(username, full_name, email, phone)")
+      .eq("event_id", event.id)
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.error("rsvps:", error.message);
+      toast.error("Could not load RSVPs.");
+    }
+    setRsvpRows(data ?? []);
+    setRsvpLoading(false);
+  };
+
+  const deleteEvent = async (event: any) => {
+    if (!window.confirm(`Delete "${event.title}"? This also removes its RSVPs.`)) return;
+    await supabase.from("bookings").delete().eq("event_id", event.id);
+    const { error } = await supabase.from("events").delete().eq("id", event.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Event deleted.");
+    setReload((n) => n + 1);
+  };
 
   const handleSignOut = async () => {
     await signOut();
     toast.success("Logged out from Mission Control");
     nav({ to: "/" });
   };
+
 
   if (!user || loading) return <div className="min-h-screen grid place-items-center bg-black"><div className="animate-spin h-12 w-12 border-4 border-accent border-t-transparent rounded-full shadow-[0_0_20px_rgba(255,165,0,0.5)]" /></div>;
 
