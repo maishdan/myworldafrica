@@ -489,7 +489,7 @@ function TicketCard({ ticket, role }: any) {
    );
 }
 
-function HostedEventRow({ event }: any) {
+function HostedEventRow({ event, onManage, onDelete }: any) {
    return (
       <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-10 shadow-xl flex flex-col md:flex-row justify-between items-center gap-8 hover:bg-white/[0.07] transition-all group">
          <div className="flex-1 text-center md:text-left">
@@ -500,18 +500,23 @@ function HostedEventRow({ event }: any) {
                   <span>Operatives RSVPs</span>
                </div>
                <div className="flex flex-col items-center md:items-start gap-1">
-                  <span className="text-white text-lg leading-none">{event.price === 0 ? "FREE" : `Ksh ${event.price}`}</span>
+                  <span className="text-white text-lg leading-none">{Number(event.price) === 0 ? "FREE" : `Ksh ${event.price}`}</span>
                   <span>Resource Cost</span>
+               </div>
+               <div className="flex flex-col items-center md:items-start gap-1">
+                  <span className="text-white text-lg leading-none">{event.date}</span>
+                  <span>{event.location}</span>
                </div>
             </div>
          </div>
          <div className="flex flex-col sm:flex-row gap-3">
-            <Button variant="outline" className="rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest border-white/10 hover:bg-white/10">Manage RSVPs</Button>
-            <Button className="bg-warm-gradient text-black rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest shadow-glow">Modify Mission</Button>
+            <Button onClick={onManage} variant="outline" className="rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest border-white/10 hover:bg-white/10">Manage RSVPs</Button>
+            <Button onClick={onDelete} variant="ghost" className="rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest text-red-500/70 hover:text-red-500"><Trash2 className="h-4 w-4 mr-2" /> Delete</Button>
          </div>
       </div>
    );
 }
+
 
 function EmptyState({ message }: { message: string }) {
    return (
