@@ -422,7 +422,7 @@ function Dashboard() {
         </main>
       </div>
 
-      <Dialog open={!!rsvpEvent} onOpenChange={(o) => !o && setRsvpEvent(null)}>
+      <Dialog open={!!rsvpEvent} onOpenChange={(o: boolean) => !o && setRsvpEvent(null)}>
         <DialogContent className="bg-black border-white/10 text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle className="uppercase italic font-black tracking-tighter text-2xl">
