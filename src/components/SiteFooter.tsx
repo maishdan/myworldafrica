@@ -1,3 +1,8 @@
+import { Link } from "@tanstack/react-router";
+import { Phone, Mail, MessageSquare, MapPin } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { CONTACT, telHref, smsHref, whatsappHref, mailHref } from "@/lib/contact";
+
 export function SiteFooter() {
   return (
     <footer className="relative border-t border-white/10 bg-black text-white mt-24 overflow-hidden">
