@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SafetyRouteImport } from './routes/safety'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as EventsRouteImport } from './routes/events'
@@ -20,6 +22,16 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventsCreateRouteImport } from './routes/events.create'
 import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafetyRoute = SafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -80,6 +92,8 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/onboarding': typeof OnboardingRoute
+  '/safety': typeof SafetyRoute
+  '/terms': typeof TermsRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/events/create': typeof EventsCreateRoute
 }
@@ -92,6 +106,8 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/onboarding': typeof OnboardingRoute
+  '/safety': typeof SafetyRoute
+  '/terms': typeof TermsRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/events/create': typeof EventsCreateRoute
 }
@@ -105,6 +121,8 @@ export interface FileRoutesById {
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/onboarding': typeof OnboardingRoute
+  '/safety': typeof SafetyRoute
+  '/terms': typeof TermsRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/events/create': typeof EventsCreateRoute
 }
@@ -119,6 +137,8 @@ export interface FileRouteTypes {
     | '/events'
     | '/feed'
     | '/onboarding'
+    | '/safety'
+    | '/terms'
     | '/events/$eventId'
     | '/events/create'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +151,8 @@ export interface FileRouteTypes {
     | '/events'
     | '/feed'
     | '/onboarding'
+    | '/safety'
+    | '/terms'
     | '/events/$eventId'
     | '/events/create'
   id:
@@ -143,6 +165,8 @@ export interface FileRouteTypes {
     | '/events'
     | '/feed'
     | '/onboarding'
+    | '/safety'
+    | '/terms'
     | '/events/$eventId'
     | '/events/create'
   fileRoutesById: FileRoutesById
@@ -156,10 +180,26 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRouteWithChildren
   FeedRoute: typeof FeedRoute
   OnboardingRoute: typeof OnboardingRoute
+  SafetyRoute: typeof SafetyRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safety': {
+      id: '/safety'
+      path: '/safety'
+      fullPath: '/safety'
+      preLoaderRoute: typeof SafetyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -255,6 +295,8 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRouteWithChildren,
   FeedRoute: FeedRoute,
   OnboardingRoute: OnboardingRoute,
+  SafetyRoute: SafetyRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

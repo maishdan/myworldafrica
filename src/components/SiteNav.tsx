@@ -57,29 +57,27 @@ export function SiteNav() {
     }
   };
 
+  const links = [
+    { to: "/", label: "Home" },
+    { to: "/feed", label: "Feed" },
+    { to: "/events", label: "Events" },
+    { to: "/about", label: "About" },
+    { to: "/safety", label: "Safety" },
+    { to: "/contact", label: "Contact" },
+  ] as const;
+
   const NavLinks = () => (
     <>
-      <Link
-        to="/"
-        className="hover:text-accent transition-colors"
-        onClick={() => setIsMenuOpen(false)}
-      >
-        Home
-      </Link>
-      <Link
-        to="/feed"
-        className="hover:text-accent transition-colors"
-        onClick={() => setIsMenuOpen(false)}
-      >
-        Feed
-      </Link>
-      <Link
-        to="/events"
-        className="hover:text-accent transition-colors"
-        onClick={() => setIsMenuOpen(false)}
-      >
-        Events
-      </Link>
+      {links.map((l) => (
+        <Link
+          key={l.to}
+          to={l.to}
+          className="hover:text-accent transition-colors"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          {l.label}
+        </Link>
+      ))}
     </>
   );
 
