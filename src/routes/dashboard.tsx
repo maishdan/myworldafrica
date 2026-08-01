@@ -421,6 +421,36 @@ function Dashboard() {
         </main>
       </div>
 
+      <Dialog open={!!rsvpEvent} onOpenChange={(o) => !o && setRsvpEvent(null)}>
+        <DialogContent className="bg-black border-white/10 text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="uppercase italic font-black tracking-tighter text-2xl">
+              RSVPs — {rsvpEvent?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto custom-scrollbar divide-y divide-white/5">
+            {rsvpLoading && <div className="py-10 text-center text-white/40 text-xs font-black uppercase tracking-widest">Loading…</div>}
+            {!rsvpLoading && rsvpRows.length === 0 && (
+              <div className="py-10 text-center text-white/30 text-xs font-black uppercase tracking-widest">No RSVPs yet</div>
+            )}
+            {rsvpRows.map((r) => (
+              <div key={r.id} className="py-4 flex items-center justify-between gap-4">
+                <div>
+                  <div className="font-black uppercase italic tracking-tighter">{r.profiles?.full_name || r.profiles?.username || "Operative"}</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-white/30">{r.profiles?.email} · {r.profiles?.phone || "no phone"}</div>
+                </div>
+                <div className="text-right text-[10px] font-black uppercase tracking-widest text-accent">
+                  {r.quantity ?? 1} ticket(s)
+                  <div className="text-white/30">{r.created_at ? new Date(r.created_at).toLocaleDateString() : ""}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+
+
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
