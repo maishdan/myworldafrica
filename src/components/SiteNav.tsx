@@ -251,11 +251,53 @@ export function SiteNav() {
               </div>
             </div>
 
-            <nav className="relative z-10 flex flex-col items-center gap-6 text-xl font-black uppercase tracking-[0.2em] w-full mt-4 text-white">
+            <nav className="relative z-10 flex flex-col items-center gap-5 text-lg font-black uppercase tracking-[0.2em] w-full mt-4 text-white">
               <NavLinks />
             </nav>
 
             <div className="relative z-10 w-full h-px bg-white/20 mt-2" />
+
+            {/* Contact details */}
+            <div className="relative z-10 w-full space-y-3">
+              <div className="text-[9px] font-black uppercase tracking-[0.3em] text-accent text-center">
+                Reach us
+              </div>
+              <a
+                href={telHref}
+                className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 text-white hover:border-accent/50 transition-colors"
+              >
+                <Phone className="h-4 w-4 text-accent" />
+                <span className="text-xs font-black tracking-widest">{CONTACT.phoneDisplay}</span>
+              </a>
+              <a
+                href={smsHref}
+                className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 text-white hover:border-accent/50 transition-colors"
+              >
+                <MessageSquare className="h-4 w-4 text-accent" />
+                <span className="text-xs font-black tracking-widest">SMS US</span>
+              </a>
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-4 py-3 bg-[#25D366]/15 border border-[#25D366]/40 text-white hover:bg-[#25D366]/25 transition-colors"
+              >
+                <WhatsAppIcon className="h-4 w-4 text-[#25D366]" />
+                <span className="text-xs font-black tracking-widest">WHATSAPP</span>
+              </a>
+              <a
+                href={mailHref}
+                className="flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 text-white hover:border-accent/50 transition-colors"
+              >
+                <Mail className="h-4 w-4 text-accent" />
+                <span className="text-[10px] font-black tracking-widest break-all">
+                  {CONTACT.email}
+                </span>
+              </a>
+            </div>
+
+            <div className="relative z-10 w-full h-px bg-white/20" />
+
 
             {user ? (
               <Button
