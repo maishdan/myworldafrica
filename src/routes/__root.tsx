@@ -78,36 +78,56 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "author", content: "My World Africa" },
+      { name: "author", content: "My World Africa Ltd" },
       { name: "theme-color", content: "#c15a2b" },
-      { title: "My World Africa | Best African Safaris, Tours & Adventure Travel" },
-      { property: "og:title", content: "My World Africa | Best African Safaris, Tours & Adventure Travel" },
-      { name: "twitter:title", content: "My World Africa | Best African Safaris, Tours & Adventure Travel" },
+      { title: "My World Africa Ltd | Software Engineering, Cybersecurity & African Tours" },
+      { property: "og:title", content: "My World Africa Ltd | Software Engineering, Cybersecurity & African Tours" },
+      { name: "twitter:title", content: "My World Africa Ltd | Software Engineering, Cybersecurity & African Tours" },
       {
         name: "description",
         content:
-          "Experience the best of Africa with My World Africa. We offer luxury wildlife safaris, Kilimanjaro trekking, Maasai Mara tours, and custom African vacation packages. Discover the heart of Africa with expert local guides and unforgettable adventures.",
+          "My World Africa Ltd is a premier Technology and Tours & Travel company. We provide elite software engineering, cybersecurity, DevOps, and curated African safaris and expeditions.",
       },
       {
         property: "og:description",
         content:
-          "Experience the best of Africa with My World Africa. We offer luxury wildlife safaris, Kilimanjaro trekking, Maasai Mara tours, and custom African vacation packages. Discover the heart of Africa with expert local guides and unforgettable adventures.",
+          "My World Africa Ltd is a premier Technology and Tours & Travel company. We provide elite software engineering, cybersecurity, DevOps, and curated African safaris and expeditions.",
       },
       {
         name: "twitter:description",
         content:
-          "Experience the best of Africa with My World Africa. We offer luxury wildlife safaris, Kilimanjaro trekking, Maasai Mara tours, and custom African vacation packages. Discover the heart of Africa with expert local guides and unforgettable adventures.",
+          "My World Africa Ltd is a premier Technology and Tours & Travel company. We provide elite software engineering, cybersecurity, DevOps, and curated African safaris and expeditions.",
       },
       {
         name: "keywords",
         content:
-          "Africa travel, African safaris, wildlife tours, Kilimanjaro climbing, Maasai Mara, Serengeti, tourism in Africa, best tour agency Africa, African holidays, adventure travel Africa, safari operator, explore Africa, luxury tours Africa",
+          "My World Africa, My World Africa Ltd, Software Engineering Kenya, Cybersecurity Nairobi, DevOps Engineering Africa, African Safaris, Tours and Travel Africa, Kilimanjaro Trekking, Maasai Mara Tours, Serengeti Safaris, Web Development Kenya, Mobile App Development Nairobi, ERP Systems Africa, CRM Systems Kenya, Enterprise Software Nairobi, Digital Marketing Kenya, SEO Services Nairobi, Graphic Design Kenya, IT Consulting Nairobi, Penetration Testing Kenya, Security Audits Africa, Cloud Architecture Kenya, Tech Company Nairobi, Travel Community Africa, Motorcycle Tours Africa, 4x4 Expeditions Africa, Adventure Travel Kenya, Luxury Safaris Africa, Wildlife Tours Africa, Ride Africa, Drive Africa, Explore Africa, Online World Kenya rebranding, Daniel Maina Wangui, Daniwest Technologies, Justice Ultimate Automobiles, Justice Automotive Kenya, Justice Corporate Logistics Kenya, Stepping To Destiny, Titan X Series Chip, Car Dealer Kenya, Car Rentals Nairobi, Vehicle Marketplace Africa, Automobile Management Systems",
       },
-      { property: "og:image", content: "/africa%20logo.png" },
-      { name: "twitter:image", content: "/africa%20logo.png" },
+      { property: "og:image", content: "/logo.png" },
+      { name: "twitter:image", content: "/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
-      { name: "robots", content: "index, follow" },
+      { property: "og:url", content: "https://myworldafrica.com" },
+      { property: "og:site_name", content: "My World Africa Ltd" },
+      { property: "og:locale", content: "en_US" },
+      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+      { name: "googlebot", content: "index, follow" },
+      { name: "bingbot", content: "index, follow" },
+      { name: "geo.region", content: "KE" },
+      { name: "geo.placename", content: "Nairobi" },
+      { name: "geo.position", content: "-1.286389;36.817223" },
+      { name: "ICBM", content: "-1.286389, 36.817223" },
+      { name: "apple-mobile-web-app-title", content: "My World Africa" },
+      { name: "application-name", content: "My World Africa" },
+      { name: "format-detection", content: "telephone=no" },
+      { name: "twitter:site", content: "@myworldafrica" },
+      { name: "twitter:creator", content: "@myworldafrica" },
+      { property: "article:publisher", content: "https://www.facebook.com/myworldafrica" },
+      { name: "category", content: "Technology, Travel, Adventure" },
+      { name: "coverage", content: "Worldwide" },
+      { name: "distribution", content: "Global" },
+      { name: "rating", content: "General" },
+      { name: "revisit-after", content: "7 days" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -116,6 +136,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        async: true,
+        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6348784444572786",
+        crossOrigin: "anonymous",
       },
     ],
   }),
@@ -145,6 +172,21 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const { user, profile, loading } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    // Tawk.to Script Injection
+    var Tawk_API = (window as any).Tawk_API || {};
+    var Tawk_LoadStart = new Date();
+    (function () {
+      var s1 = document.createElement("script"),
+        s0 = document.getElementsByTagName("script")[0];
+      s1.async = true;
+      s1.src = "https://embed.tawk.to/6a6da03c96b8361d472ce741/1juu3jrec";
+      s1.charset = "UTF-8";
+      s1.setAttribute("crossorigin", "*");
+      s0.parentNode?.insertBefore(s1, s0);
+    })();
+  }, []);
 
   useEffect(() => {
     if (!loading && user && profile) {

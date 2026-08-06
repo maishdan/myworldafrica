@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+
 export function SiteFooter() {
   return (
     <footer className="relative border-t border-white/10 bg-black text-white mt-24 overflow-hidden">
@@ -32,6 +34,11 @@ export function SiteFooter() {
         <div>
           <div className="text-xs uppercase tracking-[0.3em] text-accent mb-5 font-black">Explore</div>
           <ul className="space-y-3 text-sm font-bold uppercase tracking-wide text-white/70">
+            <li>
+              <Link to="/services" className="hover:text-white transition-colors cursor-pointer flex items-center gap-2">
+                <span className="h-1 w-1 bg-accent rounded-full" /> Our Services
+              </Link>
+            </li>
             <li className="hover:text-white transition-colors cursor-pointer flex items-center gap-2">
               <span className="h-1 w-1 bg-accent rounded-full" /> Shorts & Vlogs
             </li>
@@ -49,11 +56,15 @@ export function SiteFooter() {
         <div>
           <div className="text-xs uppercase tracking-[0.3em] text-accent mb-5 font-black">MyWorldAfrica</div>
           <ul className="space-y-3 text-sm font-bold uppercase tracking-wide text-white/70">
-            <li className="hover:text-white transition-colors cursor-pointer flex items-center gap-2">
-              <span className="h-1 w-1 bg-accent rounded-full" /> About
+            <li>
+              <Link to="/about" className="hover:text-white transition-colors cursor-pointer flex items-center gap-2">
+                <span className="h-1 w-1 bg-accent rounded-full" /> About
+              </Link>
             </li>
-            <li className="hover:text-white transition-colors cursor-pointer flex items-center gap-2">
-              <span className="h-1 w-1 bg-accent rounded-full" /> Safety on the road
+            <li>
+              <a href="https://wa.me/254701460110" target="_blank" rel="noreferrer" className="hover:text-white transition-colors cursor-pointer flex items-center gap-2">
+                <span className="h-1 w-1 bg-accent rounded-full" /> WhatsApp: 0701460110
+              </a>
             </li>
             <li className="hover:text-white transition-colors cursor-pointer flex items-center gap-2">
               <span className="h-1 w-1 bg-accent rounded-full" /> Contact
