@@ -16,6 +16,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PayRouteImport } from './routes/pay'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
 import { Route as EventsCreateRouteImport } from './routes/events.create'
@@ -55,6 +56,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PayRoute = PayRouteImport.update({
+  id: '/pay',
+  path: '/pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/onboarding': typeof OnboardingRoute
+  '/pay': typeof PayRoute
   '/services': typeof ServicesRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/events/create': typeof EventsCreateRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/onboarding': typeof OnboardingRoute
+  '/pay': typeof PayRoute
   '/services': typeof ServicesRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/events/create': typeof EventsCreateRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
   '/onboarding': typeof OnboardingRoute
+  '/pay': typeof PayRoute
   '/services': typeof ServicesRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/events/create': typeof EventsCreateRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/feed'
     | '/onboarding'
+    | '/pay'
     | '/services'
     | '/events/$eventId'
     | '/events/create'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/feed'
     | '/onboarding'
+    | '/pay'
     | '/services'
     | '/events/$eventId'
     | '/events/create'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/feed'
     | '/onboarding'
+    | '/pay'
     | '/services'
     | '/events/$eventId'
     | '/events/create'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRouteWithChildren
   FeedRoute: typeof FeedRoute
   OnboardingRoute: typeof OnboardingRoute
+  PayRoute: typeof PayRoute
   ServicesRoute: typeof ServicesRoute
 }
 
@@ -209,6 +222,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pay': {
+      id: '/pay'
+      path: '/pay'
+      fullPath: '/pay'
+      preLoaderRoute: typeof PayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
@@ -254,6 +274,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRouteWithChildren,
   FeedRoute: FeedRoute,
   OnboardingRoute: OnboardingRoute,
+  PayRoute: PayRoute,
   ServicesRoute: ServicesRoute,
 }
 export const routeTree = rootRouteImport

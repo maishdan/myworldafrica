@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Users, Ticket as TicketIcon, Download, Calendar, MapPin, DollarSign, LayoutDashboard, Settings, Award, CheckCircle, Clock, Trash2, Route as RouteIcon, Zap, Map as MapIcon, ShieldCheck, Compass, Sparkles, Menu, X, LogOut, ChevronRight, BarChart3, Globe } from "lucide-react";
+import { Users, Ticket as TicketIcon, Download, Calendar, MapPin, DollarSign, LayoutDashboard, Settings, Award, CheckCircle, Clock, Trash2, Route as RouteIcon, Zap, Map as MapIcon, ShieldCheck, Compass, Sparkles, Menu, X, LogOut, ChevronRight, BarChart3, Globe, CreditCard, Smartphone, Send, Loader2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,9 +17,14 @@ export const Route = createFileRoute("/dashboard")({
 function Dashboard() {
   const { user, profile, signOut, loading: authLoading } = useAuth();
   const nav = useNavigate();
-  const [activeTab, setActiveTab] = useState<"overview" | "events" | "tickets" | "admin" | "discovery">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "events" | "tickets" | "admin" | "discovery" | "sales">("overview");
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Sales State
+  const [salesPhone, setSalesPhone] = useState("");
+  const [salesAmount, setSalesAmount] = useState(1);
+  const [isProcessingSTK, setIsProcessingSTK] = useState(false);
 
   // Data State
   const [myHostedEvents, setMyHostedEvents] = useState<any[]>([]);
@@ -102,8 +109,61 @@ function Dashboard() {
       }
     };
     fetchData();
-  }, [user, profile, authLoading, mock_role, nav]);
+  }, [user, profile, authLoading, nav]);
 
+
+  const handleManualSTK = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!salesPhone) {
+      toast.error("Please enter a phone number");
+      return;
+    }
+
+    // Format phone number correctly for M-Pesa (254...)
+    let formattedPhone = salesPhone.trim().replace(/\+/g, "");
+    if (formattedPhone.startsWith("0")) {
+      formattedPhone = "254" + formattedPhone.substring(1);
+    } else if (formattedPhone.startsWith("7") || formattedPhone.startsWith("1")) {
+      formattedPhone = "254" + formattedPhone;
+    }
+
+    if (!/^254(7|1)\d{8}$/.test(formattedPhone)) {
+      toast.error("Invalid phone number format. Use 07... or 254...");
+      return;
+    }
+
+    setIsProcessingSTK(true);
+
+    try {
+      toast.info(`Transmitting STK Push for Ksh ${salesAmount} to ${formattedPhone}...`);
+
+      // Call the Supabase Edge Function to securely trigger M-Pesa STK Push
+      const { data, error } = await supabase.functions.invoke('mpesa-stk-push', {
+        body: {
+          phone: formattedPhone,
+          amount: salesAmount,
+          id: 'MWA-ADMIN-PUSH'
+        }
+      });
+
+      if (error) throw error;
+
+      if (data && data.ResponseCode === "0") {
+        toast.success("STK Command Executed!", {
+          description: `M-Pesa STK Prompt sent to ${formattedPhone}. Please enter PIN on the handset.`,
+        });
+      } else {
+        throw new Error(data?.CustomerMessage || "Failed to trigger prompt");
+      }
+
+      setSalesPhone("");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || "Handset Transmission Failed.");
+    } finally {
+      setIsProcessingSTK(false);
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -165,10 +225,11 @@ function Dashboard() {
 
           <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
             <NavTab active={activeTab === "overview"} onClick={() => setActiveTab("overview")} icon={LayoutDashboard} label="Overview" isOpen={isSidebarOpen} />
-            <NavTab active={activeTab === "tickets"} onClick={() => setActiveTab("tickets")} icon={TicketIcon} label={isRider ? "Missions" : isDriver ? "Convoys" : "Journeys"} isOpen={isSidebarOpen} />
-            <NavTab active={activeTab === "events"} onClick={() => setActiveTab("events")} icon={Calendar} label="Managed Rallies" isOpen={isSidebarOpen} />
-            {isExplorer && <NavTab active={activeTab === "discovery"} onClick={() => setActiveTab("discovery")} icon={Globe} label="Discovery Lab" isOpen={isSidebarOpen} />}
-            {isAdmin && <NavTab active={activeTab === "admin"} onClick={() => setActiveTab("admin")} icon={BarChart3} label="Global Command" isOpen={isSidebarOpen} />}
+            <NavTab active={activeTab === "tickets"} onClick={() => setActiveTab("tickets")} icon={TicketIcon} label={isRider ? "MISSIONS" : isDriver ? "CONVOYS" : "JOURNEYS"} isOpen={isSidebarOpen} />
+            <NavTab active={activeTab === "events"} onClick={() => setActiveTab("events")} icon={Calendar} label="MANAGED RALLIES" isOpen={isSidebarOpen} />
+            <NavTab active={activeTab === "sales"} onClick={() => setActiveTab("sales")} icon={CreditCard} label="SALES COMMAND" isOpen={isSidebarOpen} />
+            {isExplorer && <NavTab active={activeTab === "discovery"} onClick={() => setActiveTab("discovery")} icon={Globe} label="DISCOVERY LAB" isOpen={isSidebarOpen} />}
+            {isAdmin && <NavTab active={activeTab === "admin"} onClick={() => setActiveTab("admin")} icon={BarChart3} label="GLOBAL COMMAND" isOpen={isSidebarOpen} />}
           </nav>
 
           <div className="p-4 border-t border-white/5">
@@ -318,6 +379,98 @@ function Dashboard() {
                    </div>
                 </div>
              )}
+
+             {activeTab === "sales" && (
+                <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                   <div className="grid lg:grid-cols-3 gap-8">
+                      {/* Manual STK Prompt */}
+                      <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-[3rem] p-10 md:p-12 shadow-2xl relative overflow-hidden group">
+                         <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:scale-110 transition-transform duration-700">
+                            <Smartphone className="h-48 w-48 text-accent" />
+                         </div>
+
+                         <header className="mb-10">
+                            <h3 className="text-4xl font-black uppercase italic tracking-tighter mb-2 text-white">STK PUSH COMMAND</h3>
+                            <div className="flex items-center gap-2">
+                               <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-ping" />
+                               <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">Direct Handset Trigger Core</p>
+                            </div>
+                         </header>
+
+                         <form onSubmit={handleManualSTK} className="space-y-8 max-w-xl relative z-10">
+                            <div className="grid sm:grid-cols-2 gap-8">
+                               <div className="space-y-3">
+                                  <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Handset Number</Label>
+                                  <Input
+                                     required
+                                     placeholder="e.g. 254701460110"
+                                     value={salesPhone}
+                                     onChange={(e) => setSalesPhone(e.target.value)}
+                                     className="h-16 bg-white/10 border-white/10 rounded-2xl px-6 text-xl font-black italic focus:border-accent transition-all text-white placeholder:text-white/10"
+                                  />
+                               </div>
+
+                               <div className="space-y-3">
+                                  <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Amount (Ksh)</Label>
+                                  <Input
+                                     type="number"
+                                     required
+                                     value={salesAmount}
+                                     onChange={(e) => setSalesAmount(Number(e.target.value))}
+                                     className="h-16 bg-white/10 border-white/10 rounded-2xl px-6 text-xl font-black italic focus:border-accent transition-all text-accent"
+                                  />
+                               </div>
+                            </div>
+
+                            <Button
+                               disabled={isProcessingSTK}
+                               className="w-full h-20 bg-warm-gradient text-black font-black uppercase tracking-[0.2em] rounded-[2.5rem] shadow-glow hover:scale-[1.02] transition-all text-lg"
+                            >
+                               {isProcessingSTK ? (
+                                  <div className="flex items-center gap-3">
+                                     <Loader2 className="h-6 w-6 animate-spin" /> EXECUTING TRANSMISSION...
+                                  </div>
+                               ) : (
+                                  <div className="flex items-center gap-3">
+                                     <Send className="h-6 w-6" /> TRANSMIT PUSH PROMPT
+                                  </div>
+                               )}
+                            </Button>
+                         </form>
+                      </div>
+
+                      {/* STK Config & Status */}
+                      <div className="space-y-8">
+                         <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 shadow-xl">
+                            <h4 className="text-xl font-black uppercase italic tracking-tighter mb-8 flex items-center gap-3 text-white">
+                               <div className="h-2 w-2 rounded-full bg-accent shadow-[0_0_10px_orange]" /> NODE CONFIG
+                            </h4>
+                            <div className="space-y-6">
+                               <ConfigLine label="ENTITY NAME" value="MY WORLD AFRICA LTD" />
+                               <ConfigLine label="BUSINESS ID" value="174379" />
+                               <ConfigLine label="TRANSMISSION" value="ACTIVE" />
+                               <ConfigLine label="AUTH CORE" value="VERIFIED" />
+                            </div>
+                         </div>
+
+                         <div className="bg-[#25D366]/5 border border-[#25D366]/20 rounded-[2.5rem] p-10">
+                            <div className="flex items-center gap-4 mb-6">
+                               <Smartphone className="h-6 w-6 text-[#25D366]" />
+                               <h4 className="text-xl font-black uppercase italic tracking-tighter text-[#25D366]">HANDSET SUPPORT</h4>
+                            </div>
+                            <p className="text-white/40 text-[10px] font-medium leading-relaxed mb-8 uppercase tracking-widest">
+                               If no prompt appears, ensure the handset has active internet and is registered on M-Pesa.
+                            </p>
+                            <a href="https://wa.me/254701460110" target="_blank" rel="noreferrer" className="block w-full">
+                               <Button variant="outline" className="w-full h-14 border-[#25D366]/20 bg-[#25D366]/5 text-[#25D366] font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-[#25D366] hover:text-white transition-all">
+                                  WHATSAPP CEO FOR HELP
+                                </Button>
+                            </a>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             )}
           </div>
         </main>
       </div>
@@ -418,6 +571,15 @@ function EmptyState({ message }: { message: string }) {
    return (
       <div className="col-span-full py-24 text-center bg-white/5 rounded-[3rem] border-2 border-dashed border-white/5 text-white/20 font-black uppercase tracking-widest italic animate-pulse">
          {message}
+      </div>
+   );
+}
+
+function ConfigLine({ label, value }: { label: string; value: string }) {
+   return (
+      <div className="flex justify-between items-center py-3 border-b border-white/5 last:border-0">
+         <span className="text-[10px] font-black uppercase tracking-widest text-white/30">{label}</span>
+         <span className="text-sm font-bold text-white uppercase">{value}</span>
       </div>
    );
 }

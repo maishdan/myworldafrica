@@ -58,6 +58,18 @@ function EventBookingPage() {
       return;
     }
 
+    if (event.is_paid && !booked) {
+      nav({
+        to: "/pay",
+        search: {
+          amount: event.price,
+          item: `Ticket: ${event.title}`,
+          id: event.id,
+        },
+      });
+      return;
+    }
+
     setBusy(true);
     try {
       const { error } = await supabase.from("bookings").insert({
@@ -221,7 +233,7 @@ function EventBookingPage() {
                        disabled={busy}
                        className="w-full h-20 bg-warm-gradient text-primary-foreground font-black uppercase tracking-[0.2em] rounded-[2rem] shadow-glow active:scale-95 transition-all text-lg"
                      >
-                       {busy ? "Booking..." : "Secure My Ticket"}
+                       {busy ? "Processing..." : event.is_paid ? "Pay & Secure Ticket" : "Secure My Ticket"}
                      </Button>
                   </form>
 
