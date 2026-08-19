@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShieldCheck, Target, Eye, Rocket, Users, Award, Shield, Globe, Cpu, Mail, MapPin, Phone, CheckCircle2, ChevronRight, Zap, History, Building2, Flag, MessageSquare } from "lucide-react";
+import { ShieldCheck, Target, Eye, Rocket, Users, Award, Shield, Globe, Cpu, Mail, MapPin, Phone, CheckCircle2, ChevronRight, Zap, History, Building2, Flag, MessageSquare, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -27,7 +27,7 @@ function AboutPage() {
         <img src="/back 1.png" className="absolute inset-0 w-full h-full object-cover opacity-50" alt="About Hero" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/80" />
         <div className="relative z-10 text-center px-6 max-w-4xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md px-4 py-1.5 text-[10px] uppercase tracking-[0.3em] text-accent mb-6 shadow-2xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md px-6 py-2 text-xs uppercase tracking-[0.3em] text-accent mb-8 shadow-2xl">
             <Zap className="h-3 w-3 animate-pulse" />
             Our Vision & Journey
           </div>
@@ -118,8 +118,30 @@ function AboutPage() {
          </div>
       </section>
 
+      {/* The Story - Mapping Africa */}
+      <section className="py-32 px-6 relative overflow-hidden bg-black">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="text-[10px] font-black uppercase tracking-[0.4em] text-accent mb-6">Mapping the Continent</div>
+          <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none mb-10">
+            From the <span className="text-accent">saddle</span> to the <span className="text-accent">cloud</span>
+          </h2>
+          <p className="text-lg text-white/70 font-medium leading-relaxed italic">
+            "My World Africa started as a handful of riders chasing dust roads out of Nairobi. Today
+            it's a continental community of riders, drivers and explorers who host events, share
+            routes, and prove that the best way to understand Africa is to travel it yourself."
+          </p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <Value icon={Zap} title="Riders" text="Weekend runs, cross-border rallies and long-haul expeditions on two wheels." />
+        <Value icon={Compass} title="Drivers" text="4x4 convoys, offroad meets and overland routes built for four wheels." />
+        <Value icon={Globe} title="Explorers" text="Trekkers, photographers and food hunters chasing culture and stories." />
+        <Value icon={Users} title="Community" text="Free to join, always. Every event is hosted by real people on the ground." />
+      </section>
+
       {/* Verified Ecosystem */}
-      <section className="py-32 px-6">
+      <section className="py-32 px-6 bg-zinc-950/50">
          <div className="mx-auto max-w-7xl">
             <div className="text-center mb-24">
                <div className="text-xs uppercase tracking-[0.4em] text-accent font-black mb-4">The Portfolio</div>
@@ -190,14 +212,6 @@ function NodeBox({ icon: Icon, title, desc }: any) {
    );
 }
 
-function DNACard({ label }: { label: string }) {
-   return (
-      <div className="p-8 bg-white/5 border border-white/5 rounded-3xl hover:bg-accent hover:text-black transition-all duration-300 text-center">
-         <div className="text-sm font-black uppercase tracking-[0.2em]">{label}</div>
-      </div>
-   );
-}
-
 function ProjectMiniCard({ title, link, status }: any) {
    return (
       <a href={link} target="_blank" rel="noopener noreferrer" className="p-10 bg-white/5 border border-white/10 rounded-[2.5rem] hover:bg-white/10 transition-all group flex flex-col justify-between h-[280px]">
@@ -218,4 +232,14 @@ function Badge({ icon: Icon, label }: any) {
          <Icon className="h-4 w-4 text-accent" /> {label}
       </div>
    );
+}
+
+function Value({ icon: Icon, title, text }: { icon: any; title: string; text: string }) {
+  return (
+    <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8">
+      <Icon className="h-8 w-8 text-accent mb-6" />
+      <div className="text-xl font-black uppercase italic tracking-tighter">{title}</div>
+      <p className="mt-3 text-sm text-white/50 leading-relaxed font-medium">{text}</p>
+    </div>
+  );
 }

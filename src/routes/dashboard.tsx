@@ -9,6 +9,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -20,6 +21,7 @@ function Dashboard() {
   const [activeTab, setActiveTab] = useState<"overview" | "events" | "tickets" | "admin" | "discovery" | "sales">("overview");
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [reload, setReload] = useState(0);
 
   // Sales State
   const [salesPhone, setSalesPhone] = useState("");
@@ -33,6 +35,11 @@ function Dashboard() {
   const [allEvents, setAllEvents] = useState<any[]>([]);
   const [systemStats, setSystemStats] = useState({ totalUsers: 0, totalEvents: 0, globalRevenue: 0 });
   const [stats, setStats] = useState({ revenue: 0, points: 0, attended: 0, distance: 1240 });
+
+  // RSVP viewer
+  const [rsvpEvent, setRsvpEvent] = useState<any | null>(null);
+  const [rsvpRows, setRsvpRows] = useState<any[]>([]);
+  const [rsvpLoading, setRsvpLoading] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -86,10 +93,17 @@ function Dashboard() {
         if (profile?.role === "admin") {
           const [usersRes, eventsRes] = await Promise.all([
             supabase.from("profiles").select("*"),
-            supabase.from("events").select("*, profiles(username)"),
+            supabase.from("events").select("*, profiles(username)").order("created_at", { ascending: false }),
           ]);
+          if (usersRes.error) console.error("profiles:", usersRes.error.message);
+          if (eventsRes.error) console.error("all events:", eventsRes.error.message);
           setAllUsers(usersRes.data ?? []);
-          setAllEvents(eventsRes.data ?? []);
+          setAllEvents(
+            (eventsRes.data ?? []).map((e) => ({
+              ...e,
+              attendee_count: statsData?.find((s) => s.event_id === e.id)?.taken || 0,
+            })),
+          );
           setSystemStats({
             totalUsers: usersRes.data?.length || 0,
             totalEvents: eventsRes.data?.length || 0,
@@ -109,8 +123,36 @@ function Dashboard() {
       }
     };
     fetchData();
-  }, [user, profile, authLoading, nav]);
+  }, [user, profile, authLoading, nav, reload]);
 
+  const openRsvps = async (event: any) => {
+    setRsvpEvent(event);
+    setRsvpRows([]);
+    setRsvpLoading(true);
+    const { data, error } = await supabase
+      .from("bookings")
+      .select("*, profiles(username, full_name, email, phone)")
+      .eq("event_id", event.id)
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.error("rsvps:", error.message);
+      toast.error("Could not load RSVPs.");
+    }
+    setRsvpRows(data ?? []);
+    setRsvpLoading(false);
+  };
+
+  const deleteEvent = async (event: any) => {
+    if (!window.confirm(`Delete "${event.title}"? This also removes its RSVPs.`)) return;
+    await supabase.from("bookings").delete().eq("event_id", event.id);
+    const { error } = await supabase.from("events").delete().eq("id", event.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Event deleted.");
+    setReload((n) => n + 1);
+  };
 
   const handleManualSTK = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,7 +190,7 @@ function Dashboard() {
 
       if (error) throw error;
 
-      if (data && data.ResponseCode === "0") {
+      if (data && (data.ResponseCode === "0" || data.CheckoutRequestID)) {
         toast.success("STK Command Executed!", {
           description: `M-Pesa STK Prompt sent to ${formattedPhone}. Please enter PIN on the handset.`,
         });
@@ -170,6 +212,7 @@ function Dashboard() {
     toast.success("Logged out from Mission Control");
     nav({ to: "/" });
   };
+
 
   if (!user || loading) return <div className="min-h-screen grid place-items-center bg-black"><div className="animate-spin h-12 w-12 border-4 border-accent border-t-transparent rounded-full shadow-[0_0_20px_rgba(255,165,0,0.5)]" /></div>;
 
@@ -333,10 +376,21 @@ function Dashboard() {
 
              {activeTab === "events" && (
                 <div className="space-y-6">
-                   {myHostedEvents.map(e => (
-                      <HostedEventRow key={e.id} event={e} />
+                   <div className="flex flex-wrap items-center justify-between gap-4">
+                      <h3 className="text-2xl font-black uppercase italic tracking-tighter">
+                         {isAdmin ? "Every event on the platform" : "Events you host"}
+                      </h3>
+                      <div className="flex gap-3">
+                         <Button variant="outline" onClick={() => setReload(n => n + 1)} className="rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest border-white/10 hover:bg-white/10">Refresh</Button>
+                         <Link to="/events/create">
+                            <Button className="bg-accent text-black rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest">Host new event</Button>
+                         </Link>
+                      </div>
+                   </div>
+                   {(isAdmin ? allEvents : myHostedEvents).map(e => (
+                      <HostedEventRow key={e.id} event={e} onManage={() => openRsvps(e)} onDelete={() => deleteEvent(e)} />
                    ))}
-                   {myHostedEvents.length === 0 && <EmptyState message="You haven\u0027t rallied the tribe yet." />}
+                   {(isAdmin ? allEvents : myHostedEvents).length === 0 && <EmptyState message={isAdmin ? "No events published yet." : "You haven\u0027t rallied the tribe yet."} />}
                 </div>
              )}
 
@@ -348,14 +402,63 @@ function Dashboard() {
                       <StatTile label="Global Revenue" value={`Ksh ${systemStats.globalRevenue}`} icon={DollarSign} color="text-green-400" />
                    </div>
 
-                   <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl overflow-x-auto">
+                   {/* ALL EVENTS */}
+                   <div className="space-y-6">
+                      <div className="flex flex-wrap items-center justify-between gap-4">
+                         <h3 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-4">
+                            <span className="w-12 h-1 bg-accent rounded-full" /> Hosted events
+                         </h3>
+                         <Link to="/events/create">
+                            <Button className="bg-warm-gradient text-black rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest shadow-glow">Host event</Button>
+                         </Link>
+                      </div>
+                      <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl overflow-x-auto">
+                         <table className="w-full text-left border-collapse min-w-[720px]">
+                            <thead className="bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+                               <tr>
+                                  <th className="px-8 py-6">Event</th>
+                                  <th className="px-8 py-6">Host</th>
+                                  <th className="px-8 py-6">RSVPs</th>
+                                  <th className="px-8 py-6">Price</th>
+                                  <th className="px-8 py-6 text-right">Control</th>
+                               </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                               {allEvents.map(e => (
+                                  <tr key={e.id} className="hover:bg-white/5 transition-all text-sm font-bold">
+                                     <td className="px-8 py-6">
+                                        <div className="text-white uppercase italic tracking-tighter text-lg leading-none">{e.title}</div>
+                                        <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1">{e.date} · {e.location}</div>
+                                     </td>
+                                     <td className="px-8 py-6 text-white/60 text-xs uppercase tracking-widest">{e.profiles?.username || "—"}</td>
+                                     <td className="px-8 py-6 text-accent">{e.attendee_count}</td>
+                                     <td className="px-8 py-6 text-white/60 text-xs">{Number(e.price) === 0 ? "FREE" : `Ksh ${e.price}`}</td>
+                                     <td className="px-8 py-6 text-right whitespace-nowrap">
+                                        <Button variant="ghost" size="sm" onClick={() => openRsvps(e)} className="rounded-xl text-[10px] font-black uppercase tracking-widest hover:text-accent">RSVPs</Button>
+                                        <Button variant="ghost" size="sm" onClick={() => deleteEvent(e)} className="text-red-500/50 hover:text-red-500 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
+                                     </td>
+                                  </tr>
+                               ))}
+                               {allEvents.length === 0 && (
+                                  <tr><td colSpan={5} className="px-8 py-12 text-center text-white/30 font-black uppercase tracking-widest text-xs">No events yet</td></tr>
+                               )}
+                            </tbody>
+                         </table>
+                      </div>
+                   </div>
+
+                   {/* ALL USERS */}
+                   <div className="space-y-6">
+                      <h3 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-4">
+                         <span className="w-12 h-1 bg-accent rounded-full" /> Operatives
+                      </h3>
+                      <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl overflow-x-auto">
                       <table className="w-full text-left border-collapse min-w-[600px]">
                          <thead className="bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
                             <tr>
                                <th className="px-8 py-6">Operative</th>
-                               <th className="px-8 py-6">Specialization</th>
+                               <th className="px-8 py-6">Phone</th>
                                <th className="px-8 py-6">Joined</th>
-                               <th className="px-8 py-6 text-right">Control</th>
                             </tr>
                          </thead>
                          <tbody className="divide-y divide-white/5">
@@ -365,17 +468,13 @@ function Dashboard() {
                                      <div className="text-white uppercase italic tracking-tighter text-lg leading-none">{u.username}</div>
                                      <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1">{u.email}</div>
                                   </td>
-                                  <td className="px-8 py-6">
-                                     <span className="text-[9px] font-black uppercase tracking-widest border border-white/20 px-3 py-1 rounded-full">{u.role}</span>
-                                  </td>
-                                  <td className="px-8 py-6 text-white/40 text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
-                                  <td className="px-8 py-6 text-right">
-                                     <Button variant="ghost" size="sm" className="text-red-500/40 hover:text-red-500 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
-                                  </td>
+                                  <td className="px-8 py-6 text-white/50 text-xs">{u.phone || "—"}</td>
+                                  <td className="px-8 py-6 text-white/40 text-xs">{u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}</td>
                                </tr>
                             ))}
                          </tbody>
                       </table>
+                      </div>
                    </div>
                 </div>
              )}
@@ -469,11 +568,65 @@ function Dashboard() {
                          </div>
                       </div>
                    </div>
+
+                   {/* RECENT TRANSACTIONS (MOCK) */}
+                   <div className="space-y-8">
+                      <h3 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-4">
+                        <span className="w-12 h-1 bg-accent rounded-full" /> TRANSMISSION LOGS
+                      </h3>
+                      <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden">
+                         <table className="w-full text-left">
+                            <thead className="bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
+                               <tr>
+                                  <th className="px-10 py-6">TARGET HANDSET</th>
+                                  <th className="px-10 py-6">AMOUNT</th>
+                                  <th className="px-10 py-6">STK STATUS</th>
+                                  <th className="px-10 py-6 text-right">TIMESTAMP</th>
+                               </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                               <tr className="text-sm font-bold opacity-40 italic">
+                                  <td colSpan={4} className="px-10 py-12 text-center text-white/20">NO RECENT TRANSMISSIONS DETECTED</td>
+                               </tr>
+                            </tbody>
+                         </table>
+                      </div>
+                   </div>
                 </div>
              )}
           </div>
         </main>
       </div>
+
+      <Dialog open={!!rsvpEvent} onOpenChange={(o: boolean) => !o && setRsvpEvent(null)}>
+        <DialogContent className="bg-black border-white/10 text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="uppercase italic font-black tracking-tighter text-2xl">
+              RSVPs — {rsvpEvent?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto custom-scrollbar divide-y divide-white/5">
+            {rsvpLoading && <div className="py-10 text-center text-white/40 text-xs font-black uppercase tracking-widest">Loading…</div>}
+            {!rsvpLoading && rsvpRows.length === 0 && (
+              <div className="py-10 text-center text-white/30 text-xs font-black uppercase tracking-widest">No RSVPs yet</div>
+            )}
+            {rsvpRows.map((r) => (
+              <div key={r.id} className="py-4 flex items-center justify-between gap-4">
+                <div>
+                  <div className="font-black uppercase italic tracking-tighter">{r.profiles?.full_name || r.profiles?.username || "Operative"}</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-white/30">{r.profiles?.email} · {r.profiles?.phone || "no phone"}</div>
+                </div>
+                <div className="text-right text-[10px] font-black uppercase tracking-widest text-accent">
+                  {r.quantity ?? 1} ticket(s)
+                  <div className="text-white/30">{r.created_at ? new Date(r.created_at).toLocaleDateString() : ""}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+
 
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -543,7 +696,7 @@ function TicketCard({ ticket, role }: any) {
    );
 }
 
-function HostedEventRow({ event }: any) {
+function HostedEventRow({ event, onManage, onDelete }: any) {
    return (
       <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-10 shadow-xl flex flex-col md:flex-row justify-between items-center gap-8 hover:bg-white/[0.07] transition-all group">
          <div className="flex-1 text-center md:text-left">
@@ -554,18 +707,23 @@ function HostedEventRow({ event }: any) {
                   <span>Operatives RSVPs</span>
                </div>
                <div className="flex flex-col items-center md:items-start gap-1">
-                  <span className="text-white text-lg leading-none">{event.price === 0 ? "FREE" : `Ksh ${event.price}`}</span>
+                  <span className="text-white text-lg leading-none">{Number(event.price) === 0 ? "FREE" : `Ksh ${event.price}`}</span>
                   <span>Resource Cost</span>
+               </div>
+               <div className="flex flex-col items-center md:items-start gap-1">
+                  <span className="text-white text-lg leading-none">{event.date}</span>
+                  <span>{event.location}</span>
                </div>
             </div>
          </div>
          <div className="flex flex-col sm:flex-row gap-3">
-            <Button variant="outline" className="rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest border-white/10 hover:bg-white/10">Manage RSVPs</Button>
-            <Button className="bg-warm-gradient text-black rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest shadow-glow">Modify Mission</Button>
+            <Button onClick={onManage} variant="outline" className="rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest border-white/10 hover:bg-white/10">Manage RSVPs</Button>
+            <Button onClick={onDelete} variant="ghost" className="rounded-xl h-12 px-6 text-[10px] font-black uppercase tracking-widest text-red-500/70 hover:text-red-500"><Trash2 className="h-4 w-4 mr-2" /> Delete</Button>
          </div>
       </div>
    );
 }
+
 
 function EmptyState({ message }: { message: string }) {
    return (

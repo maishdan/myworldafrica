@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Menu, X, Home, Search, Calendar, MapPin, Play, MessageSquare } from "lucide-react";
+import { LogOut, Menu, X, Search, Calendar, MapPin, Play, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
