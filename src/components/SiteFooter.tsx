@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Github } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -79,14 +80,25 @@ export function SiteFooter() {
         <div className="text-[10px] uppercase tracking-[0.4em] font-bold text-white/30">
           © {new Date().getFullYear()} MyWorldAfrica.com — Made with red dust and open skies.
         </div>
-        <a
-          href="https://onlineworldkenya.vercel.app"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[10px] text-white/40 hover:text-accent transition-colors italic tracking-widest"
-        >
-          powered by online world kenya
-        </a>
+        <div className="flex items-center gap-4">
+          <a
+            href="https://onlineworldkenya.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] text-white/40 hover:text-accent transition-colors italic tracking-widest"
+          >
+            powered by my world africa
+          </a>
+          <a
+            href="https://github.com/maishdan"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/40 hover:text-accent transition-colors"
+            title="GitHub"
+          >
+            <Github className="h-4 w-4" />
+          </a>
+        </div>
       </div>
     </footer>
   );

@@ -260,7 +260,7 @@ function EventBookingPage() {
 
             <div className="text-center pt-4 opacity-50">
                <div className="text-[9px] uppercase tracking-[0.4em] font-black italic">
-                 powered by online world kenya
+                 powered by my world africa
                </div>
             </div>
           </div>
