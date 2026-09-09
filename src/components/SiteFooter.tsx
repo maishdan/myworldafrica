@@ -81,14 +81,9 @@ export function SiteFooter() {
           © {new Date().getFullYear()} MyWorldAfrica.com — Made with red dust and open skies.
         </div>
         <div className="flex items-center gap-4">
-          <a
-            href="https://onlineworldkenya.vercel.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] text-white/40 hover:text-accent transition-colors italic tracking-widest"
-          >
-            powered by my world africa
-          </a>
+          <span className="text-[10px] text-white/40 italic tracking-widest">
+            powered by my world africa ltd
+          </span>
           <a
             href="https://github.com/maishdan"
             target="_blank"

@@ -312,7 +312,7 @@ function CreateEvent() {
 
         <div className="mt-16 pt-8 border-t border-border/50 text-center flex flex-col items-center gap-2">
           <div className="font-display font-bold text-sm text-muted-foreground uppercase">MY WORLD AFRICA</div>
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground italic">powered by my world africa</div>
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground italic">powered by my world africa ltd</div>
         </div>
       </main>
       <SiteFooter />
