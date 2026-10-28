@@ -36,8 +36,8 @@ function Landing() {
 
       {/* Hero Section */}
       <section className="relative min-h-[90vh] w-full flex items-center justify-center border-b border-white/10 overflow-hidden">
-        <div className="absolute inset-0 h-full w-full object-cover opacity-20 bg-[url('/back%201.png')] bg-cover bg-center mix-blend-luminosity" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-transparent to-[#030303]" />
+        <div className="absolute inset-0 h-full w-full object-cover opacity-60 bg-[url('/back%201.png')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-[#030303]/60 to-[#030303]/40" />
 
         <div className="relative z-10 mx-auto max-w-7xl px-6 pt-24 pb-12 flex flex-col items-center">
             {/* Tech Logo Area */}
@@ -113,7 +113,8 @@ function Landing() {
 
       {/* Humanitarian Impact Section */}
       <section className="py-24 px-6 relative border-b border-white/10 bg-[#030303] overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/explorers.jpg')] bg-cover bg-center opacity-5 mix-blend-luminosity" />
+        <div className="absolute inset-0 bg-[url('/explorers.jpg')] bg-cover bg-center opacity-20" />
+        <div className="absolute inset-0 bg-[#030303]/80" />
         <div className="mx-auto max-w-7xl relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-12 mb-16">
              <div className="max-w-2xl border-l-2 border-accent pl-6">
@@ -287,7 +288,7 @@ function DivisionTile({ icon: Icon, title, subtitle, desc, items }: any) {
 function ProjectTile({ title, tag, img, link, desc }: any) {
    return (
       <a href={link} target="_blank" rel="noreferrer" className="group block relative aspect-[4/5] border border-white/10 overflow-hidden bg-[#0a0a0a]">
-         <img src={img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-20 group-hover:opacity-40 grayscale group-hover:grayscale-0 mix-blend-lighten" alt={title} />
+         <img src={img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 group-hover:opacity-100" alt={title} />
          <div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-[#030303]/80 to-transparent" />
 
          {/* Corner Accents */}
@@ -305,8 +306,8 @@ function ProjectTile({ title, tag, img, link, desc }: any) {
 function Tribe({ img, tag, title, desc }: { img: string; tag: string; title: string; desc: string }) {
   return (
     <div className="group relative overflow-hidden aspect-square border border-white/10 bg-[#0a0a0a]">
-      <img src={img} alt={title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-30 group-hover:opacity-50 grayscale group-hover:grayscale-0 mix-blend-luminosity" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
+      <img src={img} alt={title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 group-hover:opacity-100" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent" />
 
       {/* Top right indicator */}
       <div className="absolute top-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

@@ -9,7 +9,6 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { adminSignUp } from "@/lib/auth.functions";
 
 
 export const Route = createFileRoute("/auth")({
@@ -93,16 +92,22 @@ function Auth() {
         if (strength < 5) throw new Error("Password is not strong enough.");
         if (!passwordsMatch) throw new Error("Passwords do not match");
 
-        // Created server-side (email pre-confirmed) so signup never depends on SMTP.
-        await adminSignUp({
-          data: { email, password, username, role: role.toLowerCase() as "rider" | "driver" | "explorer" },
+        const { data, error: signUpErr } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { username, role: role.toLowerCase() },
+          }
         });
 
-        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
-        if (signInErr) throw signInErr;
+        if (signUpErr) throw signUpErr;
 
-        toast.success("Account created! Welcome to the tribe.");
-        nav({ to: "/onboarding" });
+        if (data.session) {
+          toast.success("Account created! Welcome to the tribe.");
+          nav({ to: "/onboarding" });
+        } else {
+          toast.success("Verification link sent! Please check your email to verify your account.");
+        }
         return;
 
       } else if (mode === "signin") {
