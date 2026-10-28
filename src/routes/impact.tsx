@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 export const Route = createFileRoute("/impact")({
   head: () => ({
@@ -289,18 +290,46 @@ function ImpactPage() {
                   </div>
                 </div>
 
-                <div className="pt-4">
-                  <Button
-                    onClick={handlePayPalDonate}
-                    disabled={isProcessing}
-                    className="w-full h-14 bg-[#FFC439] hover:bg-[#F4BB33] text-black font-bold uppercase tracking-widest text-xs rounded-none transition-all flex items-center justify-center gap-2"
-                  >
-                    {isProcessing ? "Connecting to Gateway..." : (
-                      <>
-                        Donate with <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 ml-1 object-contain" />
-                      </>
-                    )}
-                  </Button>
+                <div className="pt-4 min-h-[150px]">
+                  {amount && Number(amount) >= 1 ? (
+                    <PayPalScriptProvider options={{ clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || "sb", currency: "USD", intent: "capture" }}>
+                      <PayPalButtons
+                        forceReRender={[amount]}
+                        style={{ layout: "vertical", shape: "rect", color: "gold" }}
+                        createOrder={(data, actions) => {
+                          return actions.order.create({
+                            intent: "CAPTURE",
+                            purchase_units: [
+                              {
+                                description: "Donation to My World Africa PBO",
+                                amount: {
+                                  currency_code: "USD",
+                                  value: amount.toString(),
+                                },
+                              },
+                            ],
+                          });
+                        }}
+                        onApprove={async (data, actions) => {
+                          if (actions.order) {
+                            const details = await actions.order.capture();
+                            toast.success(`Thank you for your donation, ${details.payer?.name?.given_name}!`, {
+                              description: "Your receipt has been sent to your email."
+                            });
+                            setAmount("");
+                          }
+                        }}
+                        onError={(err) => {
+                          console.error("PayPal Error:", err);
+                          toast.error("PayPal Error", { description: "There was an error processing your PayPal transaction." });
+                        }}
+                      />
+                    </PayPalScriptProvider>
+                  ) : (
+                    <div className="text-center p-4 border border-white/10 bg-white/5 text-zinc-400 text-xs">
+                      Please select or enter an amount above $1 to enable PayPal checkout.
+                    </div>
+                  )}
                   <p className="text-[10px] text-zinc-500 text-center mt-4 uppercase tracking-widest font-bold flex items-center justify-center gap-1">
                     <Lock className="h-3 w-3" /> Secure International Gateway
                   </p>
