@@ -16,6 +16,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as ImpactRouteImport } from './routes/impact'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PayRouteImport } from './routes/pay'
 import { Route as SafetyRouteImport } from './routes/safety'
@@ -57,6 +58,11 @@ const EventsRoute = EventsRouteImport.update({
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImpactRoute = ImpactRouteImport.update({
+  id: '/impact',
+  path: '/impact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
+  '/impact': typeof ImpactRoute
   '/onboarding': typeof OnboardingRoute
   '/pay': typeof PayRoute
   '/safety': typeof SafetyRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
+  '/impact': typeof ImpactRoute
   '/onboarding': typeof OnboardingRoute
   '/pay': typeof PayRoute
   '/safety': typeof SafetyRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/events': typeof EventsRouteWithChildren
   '/feed': typeof FeedRoute
+  '/impact': typeof ImpactRoute
   '/onboarding': typeof OnboardingRoute
   '/pay': typeof PayRoute
   '/safety': typeof SafetyRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/events'
     | '/feed'
+    | '/impact'
     | '/onboarding'
     | '/pay'
     | '/safety'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/events'
     | '/feed'
+    | '/impact'
     | '/onboarding'
     | '/pay'
     | '/safety'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/events'
     | '/feed'
+    | '/impact'
     | '/onboarding'
     | '/pay'
     | '/safety'
@@ -203,6 +215,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   EventsRoute: typeof EventsRouteWithChildren
   FeedRoute: typeof FeedRoute
+  ImpactRoute: typeof ImpactRoute
   OnboardingRoute: typeof OnboardingRoute
   PayRoute: typeof PayRoute
   SafetyRoute: typeof SafetyRoute
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/impact': {
+      id: '/impact'
+      path: '/impact'
+      fullPath: '/impact'
+      preLoaderRoute: typeof ImpactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -334,6 +354,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   EventsRoute: EventsRouteWithChildren,
   FeedRoute: FeedRoute,
+  ImpactRoute: ImpactRoute,
   OnboardingRoute: OnboardingRoute,
   PayRoute: PayRoute,
   SafetyRoute: SafetyRoute,

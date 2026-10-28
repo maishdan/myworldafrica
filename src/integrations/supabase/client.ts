@@ -1,11 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Publishable (anon) key — safe to ship in the browser.
-const SUPABASE_URL = "https://kzuaiqlthsydwcazldvk.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6dWFpcWx0aHN5ZHdjYXpsZHZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3OTYzOTYsImV4cCI6MjEwMDM3MjM5Nn0.HduhjTtSV2L5WsF_HIIAPRdgCYERUDhoO3ULn_w_9Nk";
+// Fetch keys securely from the .env file instead of hardcoding them
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  console.warn("⚠️ Supabase environment variables are missing. Please check your .env file.");
+}
+
+export const supabase = createClient(SUPABASE_URL || "", SUPABASE_PUBLISHABLE_KEY || "", {
   auth: {
     persistSession: true,
     autoRefreshToken: true,

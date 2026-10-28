@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, MapPin, Play, Ticket, Users, Video, Route as RouteIcon, Sparkles, Code, ShieldCheck, Cpu, Globe, Car, BarChart3, Briefcase, Zap, Smartphone, Search, Database, ChevronRight, MessageSquare, Terminal, Server } from "lucide-react";
+import { ArrowRight, MapPin, Play, Ticket, Users, Video, Route as RouteIcon, Sparkles, Code, ShieldCheck, Cpu, Globe, Car, BarChart3, Briefcase, Zap, Smartphone, Search, Database, ChevronRight, MessageSquare, Terminal, Server, Heart, Droplets, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -10,14 +10,15 @@ import explorersImg from "@/assets/explorers.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "My World Africa Ltd | Engineering & African Exploration" },
+      { title: "My World Africa Ltd | Engineering, Travel & Impact Foundation" },
       {
         name: "description",
         content:
-          "My World Africa Ltd is a top Technology and Travel company. We build great software and lead exciting tours across Africa.",
+          "My World Africa Ltd: Premier Technology solutions, overland African Safari tours, and a dedicated Humanitarian Foundation bringing solar electricity and clean water to local communities.",
       },
-      { property: "og:title", content: "My World Africa Ltd | Engineering & African Exploration" },
-      { property: "og:description", content: "Building great software and leading amazing tours across the continent." },
+      { name: "keywords", content: "African Safari, Tech Company Nairobi, Software Engineering Kenya, Volunteer Tourism Kenya, My World Africa PBO, Solar Electricity Kenya, Clean Water Africa, Overland tours Africa" },
+      { property: "og:title", content: "My World Africa Ltd | Engineering, Travel & Impact Foundation" },
+      { property: "og:description", content: "Building great software, leading amazing tours across the continent, and funding community relief projects." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -106,6 +107,46 @@ function Landing() {
                 desc="Connecting a continental community of riders and drivers through curated events, detailed route planning, and cross-border expeditions."
                 items={["Adventure Rallies", "4x4 Convoys", "Route Planning", "Expeditions"]}
              />
+          </div>
+        </div>
+      </section>
+
+      {/* Humanitarian Impact Section */}
+      <section className="py-24 px-6 relative border-b border-white/10 bg-[#030303] overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/explorers.jpg')] bg-cover bg-center opacity-5 mix-blend-luminosity" />
+        <div className="mx-auto max-w-7xl relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-12 mb-16">
+             <div className="max-w-2xl border-l-2 border-accent pl-6">
+               <div className="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3 flex items-center gap-2">
+                 <Heart className="h-3 w-3" /> Impact Foundation (PBO)
+               </div>
+               <h2 className="text-3xl md:text-5xl font-bold uppercase tracking-tight text-white leading-tight">Beyond <br/> Exploration</h2>
+             </div>
+             <p className="text-zinc-400 max-w-md text-sm font-light leading-relaxed">
+               A percentage of every tech contract and tour booking funds our humanitarian mission. We are dedicated to providing off-grid Kenyan communities with sustainable electricity and clean water.
+             </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+             <div className="p-8 border border-white/10 bg-[#0a0a0a] group hover:border-accent/40 transition-colors">
+                <Sun className="h-8 w-8 text-accent mb-6" />
+                <h3 className="text-xl font-bold uppercase tracking-tight text-white mb-3">Solar Power</h3>
+                <p className="text-zinc-400 font-light text-xs leading-relaxed">Funding and installing solar panels to bring sustainable light and power to off-grid villages across Kenya.</p>
+             </div>
+             <div className="p-8 border border-white/10 bg-[#0a0a0a] group hover:border-accent/40 transition-colors">
+                <Droplets className="h-8 w-8 text-accent mb-6" />
+                <h3 className="text-xl font-bold uppercase tracking-tight text-white mb-3">Clean Water</h3>
+                <p className="text-zinc-400 font-light text-xs leading-relaxed">Building solar-powered water pumps and boreholes to ensure communities have access to safe, clean drinking water.</p>
+             </div>
+             <div className="p-8 border border-white/10 bg-accent/5 group hover:bg-accent/10 transition-colors flex flex-col justify-center items-center text-center">
+                <h3 className="text-lg font-bold uppercase tracking-tight text-accent mb-4">Join The Mission</h3>
+                <p className="text-zinc-400 font-light text-xs leading-relaxed mb-6">Partner with us. Your donations go directly towards our next community relief project.</p>
+                <Link to="/impact">
+                  <Button size="sm" className="bg-accent text-black hover:bg-accent/90 font-bold uppercase tracking-widest text-[10px] rounded-none px-8">
+                    View Projects
+                  </Button>
+                </Link>
+             </div>
           </div>
         </div>
       </section>

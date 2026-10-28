@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Code, ShieldCheck, Database, Search, Smartphone, Briefcase,
   Car, MapPin, Camera, Users, Zap, Globe, Cpu, Layout,
-  BarChart3, Settings, Shield, Laptop, Terminal, Server
+  BarChart3, Settings, Shield, Laptop, Terminal, Server, Heart, Sun, Droplets
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteNav } from "@/components/SiteNav";
@@ -11,11 +11,12 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
-      { title: "Our Services | My World Africa Ltd - Technology & Travel" },
+      { title: "Divisions & Services | My World Africa Ltd" },
       {
         name: "description",
-        content: "We provide great tech services like software development and security, plus exciting tours across Africa.",
+        content: "Explore My World Africa Ltd's core divisions: Enterprise Software Engineering, Overland Tours & Travel, and our Humanitarian Impact Foundation.",
       },
+      { name: "keywords", content: "Software Engineering Nairobi, Cybersecurity Kenya, Overland Tours Africa, Safari Travel Agency, Impact Philanthropy, PBO Kenya, Enterprise Systems" }
     ],
   }),
   component: ServicesPage,
@@ -32,13 +33,13 @@ function ServicesPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black" />
         <div className="relative z-10 text-center px-6 max-w-4xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-4 py-1.5 text-xs uppercase tracking-[0.3em] text-accent mb-6">
-            Tech & Travel Solutions
+            Tech, Travel & Impact
           </div>
           <h1 className="text-5xl md:text-8xl font-black text-white uppercase italic tracking-tighter leading-[0.9] mb-6">
-            What We <span className="text-accent">Offer</span>
+            Our <span className="text-accent">Divisions</span>
           </h1>
           <p className="text-xl text-white/70 font-medium max-w-2xl mx-auto leading-relaxed">
-            From building high-quality software to leading tours across Africa, we have the skills to help you.
+            From architecting enterprise software to leading continental expeditions and funding community relief.
           </p>
         </div>
       </section>
@@ -98,9 +99,10 @@ function ServicesPage() {
       <section className="py-24 px-6 bg-zinc-950">
         <div className="mx-auto max-w-7xl">
           <header className="mb-16">
-            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter">Travel Services</h2>
+            <div className="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Expeditions</div>
+            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter">Travel Division</h2>
             <p className="text-white/40 mt-4 max-w-md font-medium text-lg">
-              Discover the beauty of Africa with our expert travel team.
+              Continental exploration, overland safaris, and tactical navigation.
             </p>
           </header>
 
@@ -108,30 +110,66 @@ function ServicesPage() {
              <AdventureSection
                 title="Motorcycle Tours"
                 icon={Zap}
-                desc="Join us for exciting bike trips across Africa. We plan everything so you can just enjoy the ride."
+                desc="High-endurance routes and cross-border navigation designed exclusively for two wheels."
                 features={["Weekend Rides", "Cross-border Trips"]}
                 img="/back 1.png"
              />
              <AdventureSection
-                title="Car Adventures"
+                title="4x4 Convoys"
                 icon={Car}
-                desc="Explore the continent in a 4x4. We organize group trips and safari convoys for car lovers."
-                features={["Group Safaris", "Off-road Trips"]}
+                desc="Tactical off-road navigation and group safari deployments in fully equipped 4x4 vehicles."
+                features={["Group Safaris", "Off-road Routes"]}
                 img="/backg2.png"
              />
              <AdventureSection
-                title="Photography & Culture"
+                title="Photography Expeditions"
                 icon={Camera}
-                desc="For those who love to take photos and learn about new cultures. We take you to the best spots."
-                features={["Culture Tours", "Photo Spots"]}
+                desc="Documenting natural landscapes and local cultures through precision photography tours."
+                features={["Culture Mapping", "Photo Spots"]}
                 img="/explorers.jpg"
              />
              <AdventureSection
-                title="Car Rentals"
+                title="Fleet Rentals"
                 icon={Shield}
-                desc="We partner with Justice Group to help you rent reliable cars for your own trips."
+                desc="Partnering with Justice Logistics to provide reliable overland vehicles for private expeditions."
                 features={["Rentals", "Fleet Support"]}
                 img="/all.png"
+             />
+          </div>
+        </div>
+      </section>
+
+      {/* Humanitarian Impact Services */}
+      <section className="py-24 px-6 bg-black border-t border-white/10">
+        <div className="mx-auto max-w-7xl">
+          <header className="mb-16">
+            <div className="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3 flex items-center gap-2">
+               <Heart className="h-3 w-3" /> Philanthropy
+            </div>
+            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter">Impact Foundation</h2>
+            <p className="text-white/40 mt-4 max-w-xl font-medium text-lg">
+              Our registered PBO initiative. We channel resources into off-grid communities, ensuring sustainable development alongside our commercial success.
+            </p>
+          </header>
+
+          <div className="grid md:grid-cols-3 gap-6">
+             <ServiceDetailCard
+                icon={Sun}
+                title="Solar Energy Integration"
+                specs={["Solar Panels", "Village Lighting"]}
+                desc="Installing robust solar infrastructure to provide sustainable, off-grid electricity to remote African communities."
+             />
+             <ServiceDetailCard
+                icon={Droplets}
+                title="Clean Water Access"
+                specs={["Solar Boreholes", "Water Purification"]}
+                desc="Engineering and funding solar-powered water pumps to ensure consistent access to safe drinking water."
+             />
+             <ServiceDetailCard
+                icon={Users}
+                title="Community Support"
+                specs={["Education", "Local Employment"]}
+                desc="Creating job opportunities during our tours and funding educational resources for local youth."
              />
           </div>
         </div>

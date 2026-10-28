@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Menu, X, Search, Calendar, MapPin, Play, MessageSquare } from "lucide-react";
+import { LogOut, Menu, X, Search, Calendar, MapPin, Play, MessageSquare, ChevronDown, LayoutGrid, Heart, BookOpen, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -61,39 +61,85 @@ export function SiteNav() {
     <>
       <Link
         to="/"
-        className="hover:text-accent transition-colors"
+        className="hover:text-accent transition-colors flex items-center gap-1 text-sm font-bold uppercase tracking-wider text-white"
         onClick={() => setIsMenuOpen(false)}
       >
-        Home
+        HOME
       </Link>
-      <Link
-        to="/feed"
-        className="hover:text-accent transition-colors"
+
+      <div className="group relative">
+        <button className="hover:text-accent transition-colors flex items-center gap-2 outline-none text-sm font-bold uppercase tracking-wider text-white">
+          EXPLORE
+          <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
+        </button>
+        <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto pointer-events-none transition-all duration-300 w-64 md:w-80">
+          <div className="bg-black/95 backdrop-blur-xl border border-white/10 p-4 rounded-xl shadow-2xl flex flex-col gap-2">
+
+            <Link to="/services" className="flex items-center gap-3 p-3 hover:bg-white/10 rounded-lg transition-colors group/item" onClick={() => setIsMenuOpen(false)}>
+              <div className="bg-white/5 p-2 rounded-md group-hover/item:bg-accent group-hover/item:text-black transition-colors">
+                <Settings className="h-4 w-4" />
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-bold text-white group-hover/item:text-accent">Operations & Services</div>
+                <div className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">Tech & Travel Divisions</div>
+              </div>
+            </Link>
+
+            <Link to="/events" className="flex items-center gap-3 p-3 hover:bg-white/10 rounded-lg transition-colors group/item" onClick={() => setIsMenuOpen(false)}>
+              <div className="bg-white/5 p-2 rounded-md group-hover/item:bg-accent group-hover/item:text-black transition-colors">
+                <Calendar className="h-4 w-4" />
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-bold text-white group-hover/item:text-accent">Events & Tours</div>
+                <div className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">Join the next mission</div>
+              </div>
+            </Link>
+
+            <Link to="/feed" className="flex items-center gap-3 p-3 hover:bg-white/10 rounded-lg transition-colors group/item" onClick={() => setIsMenuOpen(false)}>
+              <div className="bg-white/5 p-2 rounded-md group-hover/item:bg-accent group-hover/item:text-black transition-colors">
+                <Play className="h-4 w-4" />
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-bold text-white group-hover/item:text-accent">Media Feed</div>
+                <div className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">Shorts & Documentation</div>
+              </div>
+            </Link>
+
+            <div className="my-1 h-px bg-white/10" />
+
+            <Link to="/impact" className="flex items-center gap-3 p-3 hover:bg-white/10 rounded-lg transition-colors group/item" onClick={() => setIsMenuOpen(false)}>
+              <div className="bg-white/5 p-2 rounded-md group-hover/item:bg-accent group-hover/item:text-black transition-colors">
+                <Heart className="h-4 w-4" />
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-bold text-white group-hover/item:text-accent">Impact Foundation</div>
+                <div className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">PBO & Community Relief</div>
+              </div>
+            </Link>
+
+            <Link to="/about" className="flex items-center gap-3 p-3 hover:bg-white/10 rounded-lg transition-colors group/item" onClick={() => setIsMenuOpen(false)}>
+              <div className="bg-white/5 p-2 rounded-md group-hover/item:bg-accent group-hover/item:text-black transition-colors">
+                <BookOpen className="h-4 w-4" />
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-bold text-white group-hover/item:text-accent">About Us</div>
+                <div className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">Company History & Goals</div>
+              </div>
+            </Link>
+
+          </div>
+        </div>
+      </div>
+
+      <a
+        href="https://wa.me/254701460110"
+        target="_blank"
+        rel="noreferrer"
+        className="hover:text-accent transition-colors flex items-center gap-1 text-sm font-bold uppercase tracking-wider text-white"
         onClick={() => setIsMenuOpen(false)}
       >
-        Feed
-      </Link>
-      <Link
-        to="/services"
-        className="hover:text-accent transition-colors"
-        onClick={() => setIsMenuOpen(false)}
-      >
-        Services
-      </Link>
-      <Link
-        to="/events"
-        className="hover:text-accent transition-colors"
-        onClick={() => setIsMenuOpen(false)}
-      >
-        Events
-      </Link>
-      <Link
-        to="/about"
-        className="hover:text-accent transition-colors"
-        onClick={() => setIsMenuOpen(false)}
-      >
-        About
-      </Link>
+        CONTACT
+      </a>
     </>
   );
 
@@ -216,16 +262,21 @@ export function SiteNav() {
 
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-2">
+              <Link to="/impact">
+                <Button size="sm" className="bg-accent text-black hover:bg-accent/90 shadow-glow hover:scale-105 transition-transform font-bold px-6 border-none">
+                  DONATE
+                </Button>
+              </Link>
               {user ? (
                 <Link to="/dashboard">
-                  <Button variant="outline" size="sm" className="h-10 border-white/10 bg-white/5 text-accent hover:bg-accent hover:text-black font-black uppercase tracking-widest text-[10px] px-6 rounded-xl transition-all">
+                  <Button variant="outline" size="sm" className="h-10 border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold uppercase tracking-widest text-[10px] px-6 rounded-none transition-all">
                     Dashboard
                   </Button>
                 </Link>
               ) : (
                 <Link to="/auth">
-                  <Button size="sm" className="bg-warm-gradient text-primary-foreground shadow-warm hover:scale-105 transition-transform font-bold px-6">
-                    JOIN THE TRIBE
+                  <Button variant="outline" size="sm" className="h-10 border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold uppercase tracking-widest text-[10px] px-6 rounded-none transition-all">
+                    JOIN
                   </Button>
                 </Link>
               )}
@@ -284,21 +335,28 @@ export function SiteNav() {
 
             <div className="relative z-10 w-full h-px bg-white/20 mt-2" />
 
-            {user ? (
-              <Button
-                variant="destructive"
-                className="relative z-10 w-full rounded-none h-14 font-black tracking-widest text-xs border border-white/10"
-                onClick={handleSignOut}
-              >
-                <LogOut className="h-4 w-4 mr-2" /> SIGN OUT
-              </Button>
-            ) : (
-              <Link to="/auth" className="relative z-10 w-full" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full bg-warm-gradient text-primary-foreground h-14 rounded-none font-black tracking-widest text-xs shadow-glow">
-                  JOIN THE TRIBE
+            <div className="relative z-10 w-full space-y-3">
+              <Link to="/impact" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                <Button className="w-full bg-accent text-black hover:bg-accent/90 h-14 rounded-none font-bold tracking-widest text-xs shadow-glow">
+                  DONATE
                 </Button>
               </Link>
-            )}
+              {user ? (
+                <Button
+                  variant="destructive"
+                  className="w-full rounded-none h-14 font-bold tracking-widest text-xs border border-white/10"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="h-4 w-4 mr-2" /> SIGN OUT
+                </Button>
+              ) : (
+                <Link to="/auth" className="w-full block" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="outline" className="w-full h-14 rounded-none font-bold tracking-widest text-xs border-white/10 bg-white/5 hover:bg-white/10 text-white">
+                    JOIN THE TRIBE
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -11,49 +11,54 @@ serve(async (req) => {
   }
 
   try {
-    const { phone, amount, id } = await req.json()
+    const { phone, amount, reference = 'DONATION' } = await req.json()
 
-    // 1. Get Access Token from Safaricom
-    const consumerKey = Deno.env.get('MPESA_CONSUMER_KEY')
-    const consumerSecret = Deno.env.get('MPESA_CONSUMER_SECRET')
-    const shortCode = "174379" // Sandbox Shortcode
-    const passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
+    // Ensure amount is an integer, Payero might reject decimals or strings
+    const parsedAmount = parseInt(amount, 10);
 
-    const auth = btoa(`${consumerKey}:${consumerSecret}`)
-    const tokenRes = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
-      headers: { Authorization: `Basic ${auth}` }
-    })
-    const { access_token } = await tokenRes.json()
+    // Clean phone number (convert 07xx to 2547xx)
+    let cleanPhone = String(phone).replace(/\s+/g, '')
+    if (cleanPhone.startsWith('0')) {
+      cleanPhone = '254' + cleanPhone.substring(1)
+    } else if (cleanPhone.startsWith('+')) {
+      cleanPhone = cleanPhone.substring(1)
+    }
 
-    // 2. Format Timestamp & Password
-    const timestamp = new Date().toISOString().replace(/[-:T.Z]/g, "").slice(0, 14)
-    const password = btoa(`${shortCode}${passkey}${timestamp}`)
+    // Fetch Payero API Credentials securely from Supabase Environment Variables
+    const PAYERO_AUTH = Deno.env.get('PAYERO_AUTH') || "Basic ZWZBRTduNk1MOFJ4NUkweTFlQlQ6SnNTWmVrbzBWNFJsNVBXclhHNU5EUDlha0phZEFGUUdRMzFzMk0xMA==";
+    const ACCOUNT_ID = Deno.env.get('PAYERO_ACCOUNT_ID') || "12947";
 
-    // 3. Initiate STK Push
-    const stkRes = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
+    // Initiate Payero STK Push
+    const payeroRes = await fetch("https://app.payero.co.ke/api/v1/payments/mpesa/stk", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${access_token}`,
-        "Content-Type": "application/json"
+        "Authorization": PAYERO_AUTH,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
       },
       body: JSON.stringify({
-        BusinessShortCode: shortCode,
-        Password: password,
-        Timestamp: timestamp,
-        TransactionType: "CustomerPayBillOnline",
-        Amount: amount,
-        PartyA: phone,
-        PartyB: shortCode,
-        PhoneNumber: phone,
-        CallBackURL: "https://myworldafrica.com/api/callback", // Replace with your real URL later
-        AccountReference: "MY WORLD AFRICA",
-        TransactionDesc: "Payment to My World Africa Ltd"
+        account_id: ACCOUNT_ID,
+        amount: amount,
+        phone: cleanPhone,
+        reference: reference
       })
     })
 
-    const result = await stkRes.json()
+    const responseText = await payeroRes.text(); // Parse as text first in case it's not JSON
 
-    return new Response(JSON.stringify(result), {
+    // Try to parse JSON safely
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (e) {
+      result = { raw_response: responseText };
+    }
+
+    // Always return 200 to the frontend so we can read the Payero error in the browser console
+    return new Response(JSON.stringify({
+      payero_status: payeroRes.status,
+      payero_response: result
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })
