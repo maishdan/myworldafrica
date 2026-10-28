@@ -12,11 +12,15 @@ import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 export const Route = createFileRoute("/impact")({
   head: () => ({
     meta: [
-      { title: "Impact Foundation | Donate to My World Africa" },
+      { title: "Impact Foundation | Donate to My World Africa PBO" },
       {
         name: "description",
-        content: "Support the My World Africa Public Benefit Organization (PBO). Donate via PayPal or M-Pesa to fund solar energy and clean water projects in Kenya.",
+        content: "Support the My World Africa Public Benefit Organization (PBO). We are an impact tourism charity funding solar energy, clean water boreholes, and community education across Kenya. Donate securely via PayPal or M-Pesa.",
       },
+      { name: "keywords", content: "Donate to Kenya, My World Africa PBO, Charity Kenya, Solar Water Pumps Africa, Solar Electricity Africa, NGO Nairobi, Public Benefit Organization Kenya, Impact Tourism Africa, Volunteer Travel Kenya, My African World Foundation alternative, Help African Communities, M-Pesa Donation, PayPal Charity Africa" },
+      { property: "og:title", content: "Donate to My World Africa Impact Foundation" },
+      { property: "og:description", content: "100% of your donations fund solar grids, clean water systems, and local education. Donate via PayPal or M-Pesa today." },
+      { property: "og:type", content: "website" }
     ],
   }),
   component: ImpactPage,

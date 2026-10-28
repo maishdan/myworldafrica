@@ -87,22 +87,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "My World Africa Ltd is a premier Technology and Tours & Travel company. We provide elite software engineering, cybersecurity, DevOps, and curated African safaris and expeditions.",
+          "My World Africa Ltd is a premier Technology and Tours & Travel company in Nairobi, Kenya. We architect elite software, lead cross-border African overland safaris, and fund the My World Africa PBO Impact Foundation providing solar energy and clean water to local communities.",
       },
       {
         property: "og:description",
         content:
-          "My World Africa Ltd is a premier Technology and Tours & Travel company. We provide elite software engineering, cybersecurity, DevOps, and curated African safaris and expeditions.",
+          "My World Africa Ltd is a premier Technology and Tours & Travel company in Nairobi, Kenya. We architect elite software, lead cross-border African overland safaris, and fund the My World Africa PBO Impact Foundation providing solar energy and clean water to local communities.",
       },
       {
         name: "twitter:description",
         content:
-          "My World Africa Ltd is a premier Technology and Tours & Travel company. We provide elite software engineering, cybersecurity, DevOps, and curated African safaris and expeditions.",
+          "My World Africa Ltd is a premier Technology and Tours & Travel company in Nairobi, Kenya. We architect elite software, lead cross-border African overland safaris, and fund the My World Africa PBO Impact Foundation providing solar energy and clean water to local communities.",
       },
       {
         name: "keywords",
         content:
-          "My World Africa, My World Africa Ltd, Software Engineering Kenya, Cybersecurity Nairobi, DevOps Engineering Africa, African Safaris, Tours and Travel Africa, Kilimanjaro Trekking, Maasai Mara Tours, Serengeti Safaris, Web Development Kenya, Mobile App Development Nairobi, ERP Systems Africa, CRM Systems Kenya, Enterprise Software Nairobi, Digital Marketing Kenya, SEO Services Nairobi, Graphic Design Kenya, IT Consulting Nairobi, Penetration Testing Kenya, Security Audits Africa, Cloud Architecture Kenya, Tech Company Nairobi, Travel Community Africa, Motorcycle Tours Africa, 4x4 Expeditions Africa, Adventure Travel Kenya, Luxury Safaris Africa, Wildlife Tours Africa, Ride Africa, Drive Africa, Explore Africa, Online World Kenya rebranding, Daniel Maina Wangui, Daniwest Technologies, Justice Ultimate Automobiles, Justice Automotive Kenya, Justice Corporate Logistics Kenya, Stepping To Destiny, Titan X Series Chip, Car Dealer Kenya, Car Rentals Nairobi, Vehicle Marketplace Africa, Automobile Management Systems",
+          "My World Africa, My World Africa Ltd, My World Africa PBO, Impact Tourism Kenya, Volunteer Tourism Africa, African Safaris, Tours and Travel Africa, Overland Tours East Africa, Motorcycle Tours Africa, 4x4 Expeditions Africa, Adventure Travel Kenya, Wildlife Tours Africa, Ride Africa, Drive Africa, Explore Africa, Donate to Africa, Solar Electricity Kenya Charity, Clean Water Africa Charity, Community Support Nairobi, Software Engineering Kenya, Cybersecurity Nairobi, DevOps Engineering Africa, Web Development Kenya, Mobile App Development Nairobi, Tech Company Nairobi, Daniel Maina Wangui, Daniwest Technologies, Justice Ultimate Automobiles, Justice Automotive Kenya, Justice Corporate Logistics Kenya, Car Rentals Nairobi, African Exploration",
       },
       { property: "og:image", content: "/logo.png" },
       { name: "twitter:image", content: "/logo.png" },
