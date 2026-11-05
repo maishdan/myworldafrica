@@ -11,15 +11,15 @@ import explorersImg from "@/assets/explorers.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "My World Africa Ltd | Engineering, Travel & Impact Foundation" },
+      { title: "My World Africa | Kenya Safari Tours, Flights & Helicopter Charters" },
       {
         name: "description",
         content:
-          "My World Africa Ltd: Premier Technology solutions, overland African Safari tours, and a dedicated Humanitarian Foundation bringing solar electricity and clean water to local communities.",
+          "Discover the beauty of Africa with My World Africa. We offer premium Kenya safari tours, domestic flights, helicopter charters, and tailor-made holiday packages.",
       },
-      { name: "keywords", content: "African Safari, Tech Company Nairobi, Software Engineering Kenya, Volunteer Tourism Kenya, My World Africa PBO, Solar Electricity Kenya, Clean Water Africa, Overland tours Africa" },
-      { property: "og:title", content: "My World Africa Ltd | Engineering, Travel & Impact Foundation" },
-      { property: "og:description", content: "Building great software, leading amazing tours across the continent, and funding community relief projects." },
+      { name: "keywords", content: "Kenya tours and travel, Maasai Mara safari packages, Helicopter charter Nairobi, Wilson Airport flights, Christmas safari Kenya, Diani beach holidays, African Safari, Tech Company Nairobi, Software Engineering Kenya" },
+      { property: "og:title", content: "My World Africa | Luxury Kenyan Safaris & Travel" },
+      { property: "og:description", content: "Discover the beauty of Africa with My World Africa. Premium Kenya safari tours, domestic flights, and helicopter charters." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

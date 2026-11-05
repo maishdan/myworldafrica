@@ -102,7 +102,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "keywords",
         content:
-          "My World Africa, My World Africa Ltd, My World Africa PBO, Impact Tourism Kenya, Volunteer Tourism Africa, African Safaris, Tours and Travel Africa, Overland Tours East Africa, Motorcycle Tours Africa, 4x4 Expeditions Africa, Adventure Travel Kenya, Wildlife Tours Africa, Ride Africa, Drive Africa, Explore Africa, Donate to Africa, Solar Electricity Kenya Charity, Clean Water Africa Charity, Community Support Nairobi, Software Engineering Kenya, Cybersecurity Nairobi, DevOps Engineering Africa, Web Development Kenya, Mobile App Development Nairobi, Tech Company Nairobi, Daniel Maina Wangui, Daniwest Technologies, Justice Ultimate Automobiles, Justice Automotive Kenya, Justice Corporate Logistics Kenya, Car Rentals Nairobi, African Exploration",
+          "My World Africa, My World Africa Ltd, Kenya Safari Tours, Helicopter Charter Nairobi, Maasai Mara Safari Packages, Christmas Safari Kenya, Diani Beach Holidays, Wilson Airport Flights, Amboseli Safari Tours, Private 4x4 Safari Kenya, Destination Weddings Kenya, Corporate Travel Agency Nairobi, Impact Tourism Kenya, Volunteer Tourism Africa, Overland Tours East Africa, Motorcycle Tours Africa, Donate to Africa, Solar Electricity Kenya Charity, Clean Water Africa Charity, Software Engineering Kenya, Cybersecurity Nairobi, Tech Company Nairobi, Daniel Maina Wangui, Daniwest Technologies, Justice Ultimate Automobiles, Justice Automotive Kenya",
       },
       { property: "og:image", content: "/logo.png" },
       { name: "twitter:image", content: "/logo.png" },
