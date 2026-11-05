@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect, useRef } from "react";
 import {
   Code, ShieldCheck, Database, Search, Smartphone, Briefcase,
   Car, MapPin, Camera, Users, Zap, Globe, Cpu, Layout,
-  BarChart3, Settings, Shield, Laptop, Terminal, Server, Heart, Sun, Droplets
+  BarChart3, Settings, Shield, Laptop, Terminal, Server, Heart, Sun, Droplets,
+  Plane, Tent, Building, Bus, FileText, Wine, Compass, Gift
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteNav } from "@/components/SiteNav";
@@ -22,173 +24,391 @@ export const Route = createFileRoute("/services")({
   component: ServicesPage,
 });
 
+const travelServices = [
+  {
+    icon: Plane,
+    title: "Air Travel & Aviation",
+    items: [
+      "International air ticketing",
+      "Domestic scheduled flights (Wilson Airport)",
+      "Private charter flights",
+      "Helicopter charters & aerial safaris",
+      "Airport transfers & VIP lounge",
+      "Medical evacuation flights"
+    ]
+  },
+  {
+    icon: Tent,
+    title: "Safari & Wildlife",
+    items: [
+      "Private 4×4 safaris",
+      "Group joining safaris",
+      "Tailor-made itineraries",
+      "Game drives & walking safaris",
+      "Balloon safaris",
+      "Photographic & birdwatching tours"
+    ]
+  },
+  {
+    icon: Building,
+    title: "Accommodation",
+    items: [
+      "Lodge & camp bookings",
+      "Hotel reservations",
+      "Private villas & homestays",
+      "Apartment & serviced stays",
+      "Room upgrades & special requests",
+      "Last-minute availability sourcing"
+    ]
+  },
+  {
+    icon: Bus,
+    title: "Ground Transport",
+    items: [
+      "Airport transfers (JKIA, Wilson, Moi)",
+      "Car hire (self-drive or chauffeur)",
+      "SGR train bookings",
+      "Luxury coach & shuttle services",
+      "Professional driver-guides",
+      "Boat & dhow transfers"
+    ]
+  },
+  {
+    icon: FileText,
+    title: "Travel Documentation",
+    items: [
+      "Visa assistance (eTA, Tourist Visa)",
+      "Passport & document checks",
+      "Travel insurance",
+      "Yellow fever & vaccination guidance",
+      "Entry/exit form support",
+      "Minor & unaccompanied travel paperwork"
+    ]
+  },
+  {
+    icon: Users,
+    title: "Corporate & MICE",
+    items: [
+      "Corporate travel management",
+      "Conferences & conventions",
+      "Incentive travel & team retreats",
+      "Meetings & workshops",
+      "Events & exhibitions",
+      "Executive/VIP travel"
+    ]
+  },
+  {
+    icon: Wine,
+    title: "Special-Interest & Lifestyle",
+    items: [
+      "Honeymoon & anniversary packages",
+      "Destination weddings",
+      "Golf safaris",
+      "Adventure tourism (hiking, rafting)",
+      "Diving, snorkelling & fishing",
+      "Wellness & spa retreats"
+    ]
+  },
+  {
+    icon: Compass,
+    title: "Concierge & Trip Support",
+    items: [
+      "24/7 in-trip support",
+      "Itinerary design & costing",
+      "Multi-country coordination",
+      "Restaurant & activity reservations",
+      "Weather & season advisory",
+      "Accessibility travel"
+    ]
+  },
+  {
+    icon: Gift,
+    title: "Peak-Season Add-Ons",
+    items: [
+      "Festive bush & beach packages",
+      "Special festive dinners",
+      "New Year's Eve events",
+      "Family reunion travel",
+      "Peak-season flight/helo priority",
+      "Gift vouchers & travel gifts"
+    ]
+  }
+];
+
+const techServices = [
+  {
+    icon: Code,
+    title: "Software Engineering",
+    items: [
+      "Custom Web Applications",
+      "Mobile App Development",
+      "Enterprise Systems (ERP/CRM)",
+      "API Integrations & Development",
+      "Database Architecture",
+      "Legacy System Migration"
+    ]
+  },
+  {
+    icon: ShieldCheck,
+    title: "Cybersecurity",
+    items: [
+      "Vulnerability Assessments",
+      "Penetration Testing",
+      "Security Audits & Compliance",
+      "Data Encryption Strategies",
+      "Threat Intelligence",
+      "Incident Response Planning"
+    ]
+  },
+  {
+    icon: Database,
+    title: "Cloud Infrastructure",
+    items: [
+      "Cloud Architecture Design",
+      "AWS/Azure/GCP Deployment",
+      "Serverless Operations",
+      "DevOps Automation (CI/CD)",
+      "Database Hosting & Backups",
+      "Disaster Recovery Systems"
+    ]
+  },
+  {
+    icon: Search,
+    title: "Digital Marketing & SEO",
+    items: [
+      "Search Engine Optimization",
+      "Pay-Per-Click Campaigns",
+      "Social Media Management",
+      "Content Strategy & Copywriting",
+      "Analytics & Reporting",
+      "Conversion Rate Optimization"
+    ]
+  },
+  {
+    icon: Briefcase,
+    title: "Branding & Design",
+    items: [
+      "Corporate Identity Design",
+      "UI/UX Design for Apps",
+      "Website Wireframing",
+      "Logo & Asset Creation",
+      "Brand Guidelines",
+      "Marketing Materials Design"
+    ]
+  },
+  {
+    icon: Settings,
+    title: "IT Consulting",
+    items: [
+      "Technology Roadmapping",
+      "Digital Transformation",
+      "System Architecture Review",
+      "Vendor & Software Selection",
+      "Project Management",
+      "IT Cost Optimization"
+    ]
+  }
+];
+
+const philanthropyServices = [
+  {
+    icon: Sun,
+    title: "Solar Energy Integration",
+    items: [
+      "Rural School Electrification",
+      "Off-grid Community Lighting",
+      "Solar Panel Procurement",
+      "Installation & Maintenance",
+      "Battery Storage Systems",
+      "Renewable Energy Education"
+    ]
+  },
+  {
+    icon: Droplets,
+    title: "Clean Water Access",
+    items: [
+      "Solar-Powered Boreholes",
+      "Water Purification Systems",
+      "Community Water Tanks",
+      "Irrigation Systems",
+      "Sanitation Solutions",
+      "Water Resource Management"
+    ]
+  },
+  {
+    icon: Users,
+    title: "Community Support",
+    items: [
+      "Local Employment Creation",
+      "Educational Sponsorships",
+      "Healthcare Supply Drops",
+      "Youth Mentorship Programs",
+      "Disaster Relief Operations",
+      "Small Business Grants"
+    ]
+  }
+];
+
+function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ease-out transform h-full ${
+        isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-16 scale-95"
+      }`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function ServicesPage() {
   return (
-    <div className="min-h-screen bg-black text-white font-sans">
+    <div className="min-h-screen bg-[#030303] text-zinc-300 font-sans selection:bg-accent selection:text-black relative">
+      {/* Clean Tech Background */}
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+
       <SiteNav />
 
       {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
-        <img src="/all.png" className="absolute inset-0 w-full h-full object-cover opacity-30" alt="Services Hero" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black" />
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden border-b border-white/10 pt-20">
+        <div className="absolute inset-0 w-full h-full object-cover opacity-20 bg-[url('/all.png')] bg-cover bg-center mix-blend-luminosity" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-transparent to-[#030303]" />
+
         <div className="relative z-10 text-center px-6 max-w-4xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-4 py-1.5 text-xs uppercase tracking-[0.3em] text-accent mb-6">
+          <div className="inline-flex items-center gap-3 border border-accent/40 bg-accent/5 backdrop-blur-sm px-5 py-1.5 text-[10px] sm:text-xs uppercase tracking-[0.3em] text-accent mb-6">
+            <Terminal className="h-3.5 w-3.5" />
             Tech, Travel & Impact
           </div>
-          <h1 className="text-5xl md:text-8xl font-black text-white uppercase italic tracking-tighter leading-[0.9] mb-6">
-            Our <span className="text-accent">Divisions</span>
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold uppercase tracking-tight text-white leading-[0.9] mb-6">
+            Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-yellow-500">Divisions</span>
           </h1>
-          <p className="text-xl text-white/70 font-medium max-w-2xl mx-auto leading-relaxed">
-            From architecting enterprise software to leading continental expeditions and funding community relief.
+          <p className="text-sm md:text-lg text-zinc-400 font-light max-w-2xl mx-auto leading-relaxed">
+            From architecting enterprise software to leading continental expeditions and funding community relief. We provide a comprehensive service catalogue.
           </p>
         </div>
       </section>
 
-      {/* Technology Services */}
-      <section className="py-24 px-6">
+      {/* Motto Banner */}
+      <div className="w-full bg-accent text-black py-5 overflow-hidden border-y border-accent/20 shadow-[0_0_30px_rgba(255,165,0,0.15)] relative z-20">
+        <div className="mx-auto max-w-7xl px-6 text-center">
+          <p className="text-xs md:text-sm font-black uppercase tracking-[0.4em] drop-shadow-sm">
+            MY WORLD AFRICA - DISCOVER THE BEAUTY OF AFRICA, ONE JOURNEY AT A TIME
+          </p>
+        </div>
+      </div>
+
+      {/* Travel Services (The 9 Categories) */}
+      <section className="py-32 px-6 relative border-b border-white/10 bg-[#060606]">
         <div className="mx-auto max-w-7xl">
-          <header className="mb-16">
-            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter">Tech Services</h2>
-            <p className="text-white/40 mt-4 max-w-md font-medium text-lg">
-              We build secure and reliable technology for businesses.
+          <header className="mb-20 text-center">
+            <div className="text-[10px] uppercase tracking-[0.4em] text-accent font-bold mb-4">Expeditions</div>
+            <h2 className="text-4xl md:text-6xl font-bold uppercase tracking-tight text-white mb-6">Travel Division</h2>
+            <p className="text-zinc-400 text-sm md:text-base font-light max-w-2xl mx-auto leading-relaxed">
+              We sell coordination, not just components. We connect flights, safaris, ground transport, accommodation, paperwork, and 24/7 support into one seamless itinerary.
             </p>
           </header>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-             <ServiceDetailCard
-                icon={Code}
-                title="Software Building"
-                specs={["Websites", "Mobile Apps", "Business Systems"]}
-                desc="We create custom apps and websites that are easy to use and help your business grow."
-             />
-             <ServiceDetailCard
-                icon={ShieldCheck}
-                title="Cybersecurity"
-                specs={["Security Checks", "System Protection"]}
-                desc="We protect your data and systems from hackers and other digital threats."
-             />
-             <ServiceDetailCard
-                icon={Database}
-                title="Cloud Services"
-                specs={["Online Storage", "System Automation"]}
-                desc="We help you store your data safely online and make your systems work faster."
-             />
-             <ServiceDetailCard
-                icon={Search}
-                title="Marketing & SEO"
-                specs={["Google Search", "Online Ads"]}
-                desc="We help more people find your business online using Google and other tools."
-             />
-             <ServiceDetailCard
-                icon={Briefcase}
-                title="Branding & Design"
-                specs={["Logo Design", "Graphic Design"]}
-                desc="We create professional logos and designs that make your brand look great."
-             />
-             <ServiceDetailCard
-                icon={Settings}
-                title="Tech Consulting"
-                specs={["IT Advice", "System Planning"]}
-                desc="We give expert advice on how to use technology to improve your business."
-             />
+            {travelServices.map((service, index) => (
+              <ServiceTile key={service.title} service={service} index={index} />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Travel Services */}
-      <section className="py-24 px-6 bg-zinc-950">
+      {/* Technology Services */}
+      <section className="py-32 px-6 relative border-b border-white/10 bg-[#030303]">
         <div className="mx-auto max-w-7xl">
-          <header className="mb-16">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3">Expeditions</div>
-            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter">Travel Division</h2>
-            <p className="text-white/40 mt-4 max-w-md font-medium text-lg">
-              Continental exploration, overland safaris, and tactical navigation.
+          <header className="mb-20 text-center">
+            <div className="text-[10px] uppercase tracking-[0.4em] text-accent font-bold mb-4">Build & Secure</div>
+            <h2 className="text-4xl md:text-6xl font-bold uppercase tracking-tight text-white mb-6">Tech Division</h2>
+            <p className="text-zinc-400 text-sm md:text-base font-light max-w-2xl mx-auto leading-relaxed">
+              We build secure and reliable technology for businesses. From custom applications to full cybersecurity audits and cloud deployment.
             </p>
           </header>
 
-          <div className="grid md:grid-cols-2 gap-8">
-             <AdventureSection
-                title="Motorcycle Tours"
-                icon={Zap}
-                desc="High-endurance routes and cross-border navigation designed exclusively for two wheels."
-                features={["Weekend Rides", "Cross-border Trips"]}
-                img="/back 1.png"
-             />
-             <AdventureSection
-                title="4x4 Convoys"
-                icon={Car}
-                desc="Tactical off-road navigation and group safari deployments in fully equipped 4x4 vehicles."
-                features={["Group Safaris", "Off-road Routes"]}
-                img="/backg2.png"
-             />
-             <AdventureSection
-                title="Photography Expeditions"
-                icon={Camera}
-                desc="Documenting natural landscapes and local cultures through precision photography tours."
-                features={["Culture Mapping", "Photo Spots"]}
-                img="/explorers.jpg"
-             />
-             <AdventureSection
-                title="Fleet Rentals"
-                icon={Shield}
-                desc="Partnering with Justice Logistics to provide reliable overland vehicles for private expeditions."
-                features={["Rentals", "Fleet Support"]}
-                img="/all.png"
-             />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {techServices.map((service, index) => (
+              <ServiceTile key={service.title} service={service} index={index} />
+            ))}
           </div>
         </div>
       </section>
 
       {/* Humanitarian Impact Services */}
-      <section className="py-24 px-6 bg-black border-t border-white/10">
-        <div className="mx-auto max-w-7xl">
-          <header className="mb-16">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-accent font-bold mb-3 flex items-center gap-2">
+      <section className="py-32 px-6 relative border-b border-white/10 bg-[#060606] overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/explorers.jpg')] bg-cover bg-center opacity-5 mix-blend-luminosity" />
+        <div className="mx-auto max-w-7xl relative z-10">
+          <header className="mb-20 text-center">
+            <div className="text-[10px] uppercase tracking-[0.4em] text-accent font-bold mb-4 flex items-center justify-center gap-2">
                <Heart className="h-3 w-3" /> Philanthropy
             </div>
-            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter">Impact Foundation</h2>
-            <p className="text-white/40 mt-4 max-w-xl font-medium text-lg">
+            <h2 className="text-4xl md:text-6xl font-bold uppercase tracking-tight text-white mb-6">Impact Foundation</h2>
+            <p className="text-zinc-400 text-sm md:text-base font-light max-w-2xl mx-auto leading-relaxed">
               Our registered PBO initiative. We channel resources into off-grid communities, ensuring sustainable development alongside our commercial success.
             </p>
           </header>
 
           <div className="grid md:grid-cols-3 gap-6">
-             <ServiceDetailCard
-                icon={Sun}
-                title="Solar Energy Integration"
-                specs={["Solar Panels", "Village Lighting"]}
-                desc="Installing robust solar infrastructure to provide sustainable, off-grid electricity to remote African communities."
-             />
-             <ServiceDetailCard
-                icon={Droplets}
-                title="Clean Water Access"
-                specs={["Solar Boreholes", "Water Purification"]}
-                desc="Engineering and funding solar-powered water pumps to ensure consistent access to safe drinking water."
-             />
-             <ServiceDetailCard
-                icon={Users}
-                title="Community Support"
-                specs={["Education", "Local Employment"]}
-                desc="Creating job opportunities during our tours and funding educational resources for local youth."
-             />
+            {philanthropyServices.map((service, index) => (
+              <ServiceTile key={service.title} service={service} index={index} />
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6">
+      <section className="py-32 px-6 bg-[#030303]">
         <div className="mx-auto max-w-7xl">
-          <div className="bg-warm-gradient rounded-[3rem] p-12 md:p-24 text-black text-center space-y-8 shadow-glow">
-             <h2 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter">Ready to Start?</h2>
-             <p className="text-xl md:text-2xl font-bold max-w-2xl mx-auto">
-                Whether you need a new app or an African adventure, we are here to help.
-             </p>
-             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                <Button className="bg-black text-white h-16 px-12 rounded-2xl font-black uppercase tracking-widest text-sm hover:scale-105 transition-transform">Start Tech Project</Button>
-                <Link to="/events">
-                   <Button variant="outline" className="h-16 px-12 rounded-2xl border-black bg-transparent text-black font-black uppercase tracking-widest text-sm hover:bg-black/10 transition-transform">Explore Tours</Button>
-                </Link>
-             </div>
+          <div className="relative border border-white/10 bg-[#0a0a0a] p-12 md:p-24 flex flex-col items-center text-center overflow-hidden">
+            {/* Tech accents */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-accent"></div>
+            <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-accent"></div>
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-accent"></div>
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-accent"></div>
+
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
+              <Cpu className="h-64 w-64" />
+            </div>
+
+            <h2 className="text-3xl md:text-5xl font-bold uppercase tracking-tight text-white mb-6 relative z-10">
+              Ready to <span className="text-accent">Initiate?</span>
+            </h2>
+            <p className="text-sm md:text-base text-zinc-400 font-light max-w-xl mb-10 relative z-10">
+              Whether you need to architect a new enterprise system or plan a cross-continental African adventure, we are standing by.
+            </p>
+
+            <div className="flex gap-4 flex-wrap justify-center relative z-10">
+              <Button size="lg" className="h-14 px-8 bg-white text-black hover:bg-zinc-200 font-bold uppercase tracking-widest text-xs rounded-none border border-white transition-all">
+                Start Tech Project
+              </Button>
+              <Link to="/events">
+                <Button size="lg" variant="outline" className="h-14 px-8 border-accent/50 bg-accent/5 text-accent hover:bg-accent hover:text-black font-bold uppercase tracking-widest text-xs rounded-none transition-all">
+                  Explore Tours
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -198,38 +418,25 @@ function ServicesPage() {
   );
 }
 
-function ServiceDetailCard({ icon: Icon, title, specs, desc }: any) {
-   return (
-      <div className="p-10 rounded-[2.5rem] bg-white/5 border border-white/10 hover:border-accent transition-all group flex flex-col h-full">
-         <Icon className="h-10 w-10 text-accent mb-6" />
-         <h3 className="text-2xl font-black uppercase italic tracking-tighter mb-4 group-hover:text-accent transition-colors">{title}</h3>
-         <p className="text-white/60 text-sm font-medium leading-relaxed mb-6 flex-1">{desc}</p>
-         <ul className="space-y-2 border-t border-white/5 pt-6">
-            {specs.map((s: string) => (
-               <li key={s} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/30">
-                  <div className="h-1 w-1 rounded-full bg-accent" /> {s}
-               </li>
-            ))}
-         </ul>
-      </div>
-   );
-}
+function ServiceTile({ service, index }: { service: any, index: number }) {
+  return (
+    <FadeIn delay={(index % 3) * 150}>
+      <div className="p-8 border border-white/10 bg-[#0a0a0a] hover:border-accent/40 transition-colors h-full flex flex-col group relative">
+        {/* Tech corner accent */}
+        <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-accent/0 group-hover:border-accent transition-colors"></div>
 
-function AdventureSection({ title, icon: Icon, desc, features, img }: any) {
-   return (
-      <div className="relative aspect-[16/10] rounded-[3rem] overflow-hidden border border-white/5 group">
-         <img src={img} className="absolute inset-0 w-full h-full object-cover grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-700" alt={title} />
-         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-         <div className="absolute inset-0 p-10 flex flex-col justify-end">
-            <Icon className="h-10 w-10 text-accent mb-4" />
-            <h3 className="text-3xl font-black uppercase italic tracking-tighter mb-4">{title}</h3>
-            <p className="text-white/60 text-sm font-medium leading-relaxed mb-6 max-w-md">{desc}</p>
-            <div className="flex flex-wrap gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-               {features.map((f: string) => (
-                  <span key={f} className="px-3 py-1.5 bg-accent/20 border border-accent/20 rounded-full text-[8px] font-black uppercase tracking-widest text-accent">{f}</span>
-               ))}
-            </div>
-         </div>
+        <service.icon className="h-10 w-10 text-accent mb-6 opacity-80 group-hover:opacity-100 transition-opacity" />
+        <h3 className="text-xl font-bold uppercase tracking-tight text-white mb-6">{service.title}</h3>
+
+        <ul className="space-y-4 flex-1">
+          {service.items.map((item: string, i: number) => (
+            <li key={i} className="flex items-start gap-3">
+              <div className="h-1.5 w-1.5 mt-1.5 rounded-full bg-accent/50 group-hover:bg-accent shrink-0 transition-colors" />
+              <span className="text-xs text-zinc-400 font-light leading-relaxed group-hover:text-zinc-300 transition-colors">{item}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-   );
+    </FadeIn>
+  );
 }

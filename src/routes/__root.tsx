@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -170,6 +170,73 @@ function RootShell({ children }: { children: ReactNode }) {
 
 import { useAuth } from "@/hooks/useAuth";
 
+// Global Loading Screen Component
+function GlobalLoader() {
+  const router = useRouter();
+  const [show, setShow] = useState(true);
+
+  useEffect(() => {
+    // Whenever the route changes, show the loader for 15 seconds
+    const unsubscribe = router.subscribe("onLoad", () => {
+      setShow(true);
+      const timer = setTimeout(() => setShow(false), 15000);
+      return () => clearTimeout(timer);
+    });
+
+    // Also trigger on initial page load
+    setShow(true);
+    const initialTimer = setTimeout(() => setShow(false), 15000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      unsubscribe();
+    };
+  }, [router]);
+
+  if (!show) return null;
+
+  return (
+    <div className="fixed inset-0 z-[99999] bg-[#030303] flex flex-col items-center justify-between text-white overflow-hidden selection:bg-accent selection:text-black">
+      {/* Background Effect */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+
+      {/* Header Section */}
+      <div className="pt-20 flex flex-col items-center relative z-10 animate-in fade-in slide-in-from-top-10 duration-1000">
+        <img
+          src="/logo.png"
+          alt="My World Africa Logo"
+          className="h-24 md:h-32 w-auto object-contain mb-6 drop-shadow-[0_0_15px_rgba(255,165,0,0.5)] animate-pulse"
+        />
+        <h1 className="font-sans font-black leading-[0.85] text-4xl md:text-5xl tracking-tighter uppercase text-center">
+          <div className="text-white">MY WORLD</div>
+          <div className="text-accent mt-1">AFRICA</div>
+        </h1>
+        <p className="mt-8 text-xs md:text-sm font-bold uppercase tracking-[0.4em] text-zinc-400 text-center px-6 drop-shadow-sm">
+          Discover the beauty of Africa, one journey at a time
+        </p>
+      </div>
+
+      {/* Center GIF */}
+      <div className="relative z-10 flex-1 flex items-center justify-center w-full max-w-lg px-8">
+        <img
+          src="/guanxian_gif 800×600 Pixel.gif"
+          alt="Loading Interface"
+          className="w-full h-auto object-contain mix-blend-screen opacity-80"
+        />
+      </div>
+
+      {/* Footer Section */}
+      <div className="pb-10 relative z-10 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+        <div className="text-[10px] uppercase tracking-[0.4em] font-bold text-white/30 text-center">
+          © {new Date().getFullYear()} MyWorldAfrica.com
+          <br/>
+          <span className="mt-2 inline-block">Initializing Continental Core...</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const { user, profile, loading } = useAuth();
@@ -204,6 +271,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <GlobalLoader />
       <Outlet />
       <Toaster />
     </QueryClientProvider>

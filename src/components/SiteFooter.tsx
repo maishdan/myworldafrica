@@ -80,6 +80,9 @@ export function SiteFooter() {
         <div className="text-[10px] uppercase tracking-[0.4em] font-bold text-white/30">
           © {new Date().getFullYear()} MyWorldAfrica.com — Made with red dust and open skies.
         </div>
+        <div className="text-[8px] md:text-[10px] uppercase tracking-[0.3em] font-bold text-accent italic mb-2">
+          MY WORLD AFRICA - DISCOVER THE BEAUTY OF AFRICA, ONE JOURNEY AT A TIME
+        </div>
         <div className="flex items-center gap-4">
           <span className="text-[10px] text-white/40 italic tracking-widest">
             powered by my world africa ltd
