@@ -81,28 +81,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { httpEquiv: "X-UA-Compatible", content: "IE=edge" },
       { name: "author", content: "My World Africa Ltd" },
       { name: "theme-color", content: "#c15a2b" },
-      { title: "My World Africa Ltd | Software Engineering, Cybersecurity & African Tours" },
-      { property: "og:title", content: "My World Africa Ltd | Software Engineering, Cybersecurity & African Tours" },
-      { name: "twitter:title", content: "My World Africa Ltd | Software Engineering, Cybersecurity & African Tours" },
+      { title: "My World Africa | Kenya Safari Tours, Flights & Helicopter Charters" },
+      { property: "og:title", content: "My World Africa - Luxury Kenyan Safaris & Travel" },
+      { name: "twitter:title", content: "My World Africa - Luxury Kenyan Safaris & Travel" },
       {
         name: "description",
         content:
-          "My World Africa Ltd is a premier Technology and Tours & Travel company in Nairobi, Kenya. We architect elite software, lead cross-border African overland safaris, and fund the My World Africa PBO Impact Foundation providing solar energy and clean water to local communities.",
+          "Discover the beauty of Africa with My World Africa. We offer premium Kenya safari tours, domestic flights, helicopter charters, and tailor-made Christmas holiday packages.",
       },
       {
         property: "og:description",
         content:
-          "My World Africa Ltd is a premier Technology and Tours & Travel company in Nairobi, Kenya. We architect elite software, lead cross-border African overland safaris, and fund the My World Africa PBO Impact Foundation providing solar energy and clean water to local communities.",
+          "Discover the beauty of Africa with My World Africa. We offer premium Kenya safari tours, domestic flights, helicopter charters, and tailor-made Christmas holiday packages.",
       },
       {
         name: "twitter:description",
         content:
-          "My World Africa Ltd is a premier Technology and Tours & Travel company in Nairobi, Kenya. We architect elite software, lead cross-border African overland safaris, and fund the My World Africa PBO Impact Foundation providing solar energy and clean water to local communities.",
+          "Discover the beauty of Africa with My World Africa. We offer premium Kenya safari tours, domestic flights, helicopter charters, and tailor-made Christmas holiday packages.",
       },
       {
         name: "keywords",
         content:
-          "My World Africa, My World Africa Ltd, Kenya Safari Tours, Helicopter Charter Nairobi, Maasai Mara Safari Packages, Christmas Safari Kenya, Diani Beach Holidays, Wilson Airport Flights, Amboseli Safari Tours, Private 4x4 Safari Kenya, Destination Weddings Kenya, Corporate Travel Agency Nairobi, Impact Tourism Kenya, Volunteer Tourism Africa, Overland Tours East Africa, Motorcycle Tours Africa, Donate to Africa, Solar Electricity Kenya Charity, Clean Water Africa Charity, Software Engineering Kenya, Cybersecurity Nairobi, Tech Company Nairobi, Daniel Maina Wangui, Daniwest Technologies, Justice Ultimate Automobiles, Justice Automotive Kenya",
+          "Kenya tours and travel, Maasai Mara safari packages, Helicopter charter Nairobi, Wilson Airport flights, Christmas safari Kenya, Diani beach holidays, Private charter flights Kenya, Scenic helicopter flights Rift Valley, Great Migration Kenya packages, Amboseli National Park safari tours, Tsavo East and West safari, Tailor-made Kenya safaris, Honeymoon safari Kenya, Luxury Maasai Mara tours, My World Africa, African Safaris, Overland Tours East Africa, Corporate travel agency Nairobi, MICE travel Kenya, Best tour operators in Nairobi",
       },
       { property: "og:image", content: "/logo.png" },
       { name: "twitter:image", content: "/logo.png" },

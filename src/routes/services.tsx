@@ -413,7 +413,140 @@ function ServicesPage() {
         </div>
       </section>
 
+      {/* Comprehensive Service Catalogue (SEO Driven) */}
+      <section className="py-24 px-6 bg-[#030303] border-t border-white/10">
+        <div className="mx-auto max-w-7xl">
+          <header className="mb-16">
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white">Comprehensive Service Catalogue</h2>
+            <p className="text-zinc-400 mt-4 max-w-2xl font-light text-sm md:text-base leading-relaxed">
+              As a premier travel operator, My World Africa Ltd coordinates complete, end-to-end itineraries. Review our full menu of aviation, safari, and logistical services below.
+            </p>
+          </header>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <SeoListCard
+              title="Air Travel & Aviation"
+              items={[
+                "International air ticketing",
+                "Domestic scheduled flights (Wilson Airport)",
+                "Private charter flights",
+                "Helicopter charters & Aerial safaris",
+                "Airport transfers & VIP lounge",
+                "Medical evacuation flights (AMREF)"
+              ]}
+            />
+            <SeoListCard
+              title="Safari & Wildlife"
+              items={[
+                "Private 4×4 safaris in Kenya",
+                "Group joining safaris",
+                "Great Migration tailored itineraries",
+                "Game drives & Guided bush walks",
+                "Hot-air balloon safaris (Maasai Mara)",
+                "Specialist photographic & birdwatching tours"
+              ]}
+            />
+            <SeoListCard
+              title="Accommodation Services"
+              items={[
+                "Safari lodge & Tented camp bookings",
+                "Luxury hotel reservations in Nairobi",
+                "Private beach villas (Diani & Lamu)",
+                "Apartment & Serviced stays",
+                "Honeymoon suites & special requests",
+                "Last-minute peak season sourcing"
+              ]}
+            />
+            <SeoListCard
+              title="Ground Transport & Logistics"
+              items={[
+                "JKIA & Moi International transfers",
+                "4x4 Land Cruiser & SUV hire",
+                "SGR Train bookings & connections",
+                "Luxury coach & shuttle services",
+                "Multilingual professional driver-guides",
+                "Boat & Dhow coastal excursions"
+              ]}
+            />
+            <SeoListCard
+              title="Travel Documentation"
+              items={[
+                "Kenya eTA & East Africa Tourist Visa",
+                "Passport & Document validity checks",
+                "Travel & Medical evacuation insurance",
+                "Yellow fever & Health entry guidance",
+                "Customs & Entry/Exit form support",
+                "Minor & Unaccompanied travel paperwork"
+              ]}
+            />
+            <SeoListCard
+              title="Corporate & MICE Services"
+              items={[
+                "Corporate travel management",
+                "Conferences & Convention logistics",
+                "Incentive travel & Team retreats",
+                "Boardroom & Off-site coordination",
+                "Events & Exhibition group accommodation",
+                "Executive/VIP secure travel handling"
+              ]}
+            />
+            <SeoListCard
+              title="Special-Interest & Lifestyle"
+              items={[
+                "Honeymoon & Anniversary packages",
+                "Destination wedding logistics",
+                "Nairobi & Coastal Golf safaris",
+                "Hiking (Mt Kenya, Kilimanjaro) & Rafting",
+                "Diving & Snorkelling marine excursions",
+                "Cultural, Heritage & Culinary tours"
+              ]}
+            />
+            <SeoListCard
+              title="Concierge & Trip Support"
+              items={[
+                "24/7 in-trip emergency support",
+                "Custom itinerary design & costing",
+                "Multi-country coordination (Kenya/Tanzania/Uganda)",
+                "Restaurant & exclusive activity reservations",
+                "Weather & Season advisory (Migration timing)",
+                "Lost luggage & Disruption recovery"
+              ]}
+            />
+            <SeoListCard
+              title="Peak-Season & Festive Add-Ons"
+              items={[
+                "Festive bush & beach Christmas packages",
+                "Special Christmas Eve/Day lodge dinners",
+                "New Year's Eve coastal celebrations",
+                "Family reunion multi-generation travel",
+                "Peak-season flight & helicopter priority",
+                "Experience gift vouchers"
+              ]}
+            />
+          </div>
+        </div>
+      </section>
+
       <SiteFooter />
+    </div>
+  );
+}
+
+function SeoListCard({ title, items }: { title: string, items: string[] }) {
+  return (
+    <div className="p-8 border border-white/5 bg-[#050505] hover:border-accent/30 transition-all rounded-none relative group">
+      {/* Accent Corner */}
+      <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-accent/0 group-hover:border-accent transition-colors"></div>
+
+      <h3 className="text-lg font-bold text-white mb-6 uppercase tracking-tight">{title}</h3>
+      <ul className="space-y-3">
+        {items.map((item, i) => (
+          <li key={i} className="flex items-start gap-3 text-xs text-zinc-400 font-light">
+            <span className="text-accent mt-0.5 shrink-0">▹</span>
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
