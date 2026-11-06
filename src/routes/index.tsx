@@ -268,10 +268,28 @@ function Landing() {
             <div className="absolute top-0 left-0 w-32 md:w-64 h-full bg-gradient-to-r from-[#060606] via-[#060606]/80 to-transparent z-10 pointer-events-none" />
             <div className="absolute top-0 right-0 w-32 md:w-64 h-full bg-gradient-to-l from-[#060606] via-[#060606]/80 to-transparent z-10 pointer-events-none" />
 
-            <div className="flex whitespace-nowrap animate-marquee gap-6 pl-6">
+            <div className="flex whitespace-nowrap animate-marquee gap-6 pl-6 items-center">
               {[...marqueeImages, ...marqueeImages].map((src, i) => (
-                <img key={i} src={src} className="h-64 w-auto aspect-[4/3] object-cover rounded-xl border border-white/10 shadow-2xl brightness-75 hover:brightness-110 transition-all duration-500 cursor-pointer" alt="Gallery" />
+                <img key={i} src={src} className="h-64 w-auto aspect-[4/3] object-cover rounded-xl border border-white/10 shadow-2xl brightness-75 hover:brightness-110 transition-all duration-500 cursor-pointer shrink-0" alt="Gallery" />
               ))}
+
+              {/* Insert the video into the marquee flow */}
+              <video
+                src="/images/My_World_Africa_Tours_commercial_37318ee8_1080p.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="h-64 w-auto aspect-[16/9] object-cover rounded-xl border border-white/10 shadow-2xl brightness-75 hover:brightness-110 transition-all duration-500 cursor-pointer shrink-0"
+              />
+              <video
+                src="/images/My_World_Africa_Tours_commercial_37318ee8_1080p.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="h-64 w-auto aspect-[16/9] object-cover rounded-xl border border-white/10 shadow-2xl brightness-75 hover:brightness-110 transition-all duration-500 cursor-pointer shrink-0"
+              />
             </div>
           </div>
         </section>
